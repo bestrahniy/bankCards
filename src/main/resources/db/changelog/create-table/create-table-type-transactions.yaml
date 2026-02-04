@@ -1,21 +1,21 @@
 databaseChangeLog:
   - changeSet:
-      id: create-role-table
+      id: create-type-transactions-table
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: "roles"
+            tableName: type-transactions
             columns:
               - column:
                   name: id
-                  type: INTEGER
+                  type: SERIAL
                   constraints:
                     nullable: false
                     unique: true
                     primaryKey: true
               - column:
-                  name: role
-                  type: text
+                  name: type
+                  type: VARCHAR(50)
                   constraints:
                     nullable: false
                     unique: true

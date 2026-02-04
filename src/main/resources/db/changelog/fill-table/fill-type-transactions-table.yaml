@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-type-transactions-table
+      author: ilya
+      changes:
+          - insert:
+              tableName: type-transactions
+              columns:
+                - column:
+                    name: type
+                    value: DEPOSIT
+          - insert:
+              tableName: type-transactions
+              columns:
+                - column:
+                    name: type
+                    value: WITHDRAWAL
+          - insert:
+              tableName: type-transactions
+              columns:
+                - column:
+                    name: type
+                    value: TRANSFER
+          - insert:
+              tableName: type-transactions
+              columns:
+                - column:
+                    name: type
+                    value: PAYMENT
+          - insert:
+              tableName: type-transactions
+              columns:
+                - column:
+                    name: type
+                    value: INTERNAL_TRANSFER

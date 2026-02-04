@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-status-transactions-table
+      author: Bobkov Ilya
+      changes:
+        - createTable:
+            tableName: status-transactions
+            columns:
+              - column:
+                  name: id
+                  type: SERIAL
+                  constraints:
+                    nullable: false
+                    unique: true
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: is_active
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false

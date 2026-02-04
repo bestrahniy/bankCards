@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-role-table
+      author: ilya
+      changes:
+          - insert:
+              tableName: roles
+              columns:
+                - column:
+                    name: role
+                    value: ADMIN
+          - insert:
+              tableName: roles
+              columns:
+                - column:
+                    name: role
+                    value: USER

@@ -42,6 +42,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: "PENDING"
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_at
                   type: TIMESTAMPTZ
                   constraints:

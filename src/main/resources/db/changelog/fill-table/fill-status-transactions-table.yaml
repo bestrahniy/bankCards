@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill-status-transactions-table
+      author: ilya
+      changes:
+          - insert:
+              tableName: status-transactions
+              columns:
+                - column:
+                    name: status
+                    value: PENDING
+          - insert:
+              tableName: status-transactions
+              columns:
+                - column:
+                    name: status
+                    value: PROCESSING
+          - insert:
+              tableName: status-transactions
+              columns:
+                - column:
+                    name: status
+                    value: COMPLETED
+          - insert:
+              tableName: status-transactions
+              columns:
+                - column:
+                    name: status
+                    value: FAILED

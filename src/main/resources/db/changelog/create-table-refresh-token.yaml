@@ -1,40 +1,32 @@
 databaseChangeLog:
   - changeSet:
-      id: create-table
+      id: create-refresh-token-table
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: "users"
+            tableName: refresh_token
             columns:
               - column:
                   name: id
                   type: UUID
                   defaultValueComputed: gen_random_uuid()
                   constraints:
-                    primaryKey: true
                     nullable: false
                     unique: true
               - column:
-                  name: login
-                  type: varchar(64)
+                  name: hash_token
+                  type: text
                   constraints:
                     nullable: false
-                    unique: true
-              - column:
-                  name: password
-                  type: varchar(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: email
-                  type: varchar(64)
-                  constraints:
-                    nullable: false
-                    unique: true
               - column:
                   name: created_at
-                  type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
+                  type: TIMESTAMPTZ
+                  constraints:
+                    defaultValueComputed: CURRENT_TIMESTAMP
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: TIMESTAMPTZ
                   constraints:
                     nullable: false
               - column:
@@ -43,4 +35,18 @@ databaseChangeLog:
                   defaultValue: true
                   constraints:
                     nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
 
+        - addForeignKeyConstraint:
+            constraintName: fk_users_refresh_token
+            baseColumnNames: user_id
+            baseTableName: refresh_token
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true

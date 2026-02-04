@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-role-table
+      author: Bobkov Ilya
+      changes:
+        - createTable:
+            tableName: "roles"
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+                    unique: true
+                    primaryKey: true
+              - column:
+                  name: role
+                  type: text
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: is_active
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false

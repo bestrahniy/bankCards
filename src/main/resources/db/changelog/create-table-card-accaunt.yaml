@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-card-accaunt-table
+      author: Bobkov Ilya
+      changes:
+        - createTable:
+            tableName: card-accaunt
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: current_balance
+                  type: DECIMAL(15,2)
+                  defaultValue: 0.00
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: card_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_bank-cards_card-accaunt
+            baseColumnNames: card_id
+            baseTableName: card-accaunt
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: bank-cards
+            validate: true

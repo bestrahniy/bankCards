@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payment-transactions-table
+      author: Bobkov Ilya
+      changes:
+        - createTable:
+            tableName: payment-transactions
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    unique: true
+              - column:
+                  name: sender_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: recipient_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: comment
+                  type: text
+                  constraints:
+                    unique: false
+              - column:
+                  name: amoun
+                  type: DECIMAL(15, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  constraints:
+                    defaultValueComputed: CURRENT_TIMESTAMP
+                    nullable: false
+              - column:
+                  name: card_accaunt_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_card-accaunt_payment-transactions
+            baseColumnNames: card_accaunt_id
+            baseTableName: payment-transactions
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: card-accaunt
+            validate: true

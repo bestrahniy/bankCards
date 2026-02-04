@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-payment-transactions-table
+      id: create-payment-transactions-table-01
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: payment-transactions
+            tableName: payment_transactions
             columns:
               - column:
                   name: id
@@ -15,36 +15,34 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: sender_account_id
+                  name: sender_card_account_id
                   type: UUID
                   constraints:
                     nullable: false
-                    unique: false
               - column:
                   name: recipient_account_id
                   type: UUID
                   constraints:
                     nullable: false
-                    unique: true
+                    unique: false
               - column:
                   name: comment
                   type: text
                   constraints:
                     unique: false
               - column:
-                  name: amoun
+                  name: amount
                   type: DECIMAL(15, 2)
                   constraints:
                     nullable: false
               - column:
-                  name: type
-                  type: VARCHAR(20)
+                  name: type_id
+                  type: INTEGER
                   constraints:
                     nullable: false
               - column:
-                  name: status
-                  type: VARCHAR(20)
-                  defaultValue: "PENDING"
+                  name: status_id
+                  type: INTEGER
                   constraints:
                     nullable: false
               - column:
@@ -53,18 +51,33 @@ databaseChangeLog:
                   constraints:
                     defaultValueComputed: CURRENT_TIMESTAMP
                     nullable: false
-              - column:
-                  name: card_accaunt_id
-                  type: UUID
-                  constraints:
-                    nullable: false
 
         - addForeignKeyConstraint:
-            constraintName: fk_card-accaunt_payment-transactions
-            baseColumnNames: card_accaunt_id
-            baseTableName: payment-transactions
+            constraintName: fk_card_accaunt_payment_transactions
+            baseColumnNames: sender_card_account_id
+            baseTableName: payment_transactions
             onDelete: CASCADE
             onUpdate: RESTRICT
             referencedColumnNames: id
-            referencedTableName: card-accaunt
+            referencedTableName: card_account
+            validate: true
+
+        - addForeignKeyConstraint:
+            constraintName: fk_transactions_type_payment_transactions
+            baseColumnNames: type_id
+            baseTableName: payment_transactions
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: transactions_type
+            validate: true
+
+        - addForeignKeyConstraint:
+            constraintName: fk_status_transactions_payment_transactions
+            baseColumnNames: status_id
+            baseTableName: payment_transactions
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: status_transactions
             validate: true

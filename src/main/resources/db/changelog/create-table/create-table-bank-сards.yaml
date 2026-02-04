@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: bank-cards
+            tableName: bank_cards
             columns:
               - column:
                   name: id
@@ -53,7 +53,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             constraintName: fk_users_bank_cards
             baseColumnNames: user_id
-            baseTableName: bank-cards
+            baseTableName: bank_cards
             onDelete: CASCADE
             onUpdate: RESTRICT
             referencedColumnNames: id

@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-type-transactions-table
+      id: create-type-transactions-table-01
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: type-transactions
+            tableName: transactions_type
             columns:
               - column:
                   name: id

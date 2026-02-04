@@ -1,20 +1,20 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/create-table/create-table-users.yaml
-  - include:
       file: db/changelog/create-table/create-table-role.yaml
   - include:
-      file: db/changelog/create-table/create-table-bankCards.yaml
+      file: db/changelog/create-table/create-table-users.yaml
   - include:
-      file: db/changelog/create-table/create-table-refresh-token.yaml
+      file: db/changelog/create-table/create-table-bank-сards.yaml
   - include:
-      file: db/changelog/create-table/create-table-card-accaunt.yaml
-  - include:
-      file: db/changelog/create-table/create-table-payment-transactions.yaml
+      file: db/changelog/create-table/create-table-card-account.yaml
   - include:
       file: db/changelog/create-table/create-table-type-transactions.yaml
   - include:
       file: db/changelog/create-table/create-table-status-transactions.yaml
+  - include:
+      file: db/changelog/create-table/create-table-payment-transactions.yaml
+  - include:
+      file: db/changelog/create-table/create-table-refresh-token.yaml
   - include:
       file: db/changelog/fill-table/fill-role-table.yaml
   - include:

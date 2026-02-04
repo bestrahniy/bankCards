@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Bobkov Ilya
       changes:
         - createTable:
-            tableName: status-transactions
+            tableName: status_transactions
             columns:
               - column:
                   name: id

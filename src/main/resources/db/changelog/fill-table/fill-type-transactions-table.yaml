@@ -1,34 +1,34 @@
 databaseChangeLog:
   - changeSet:
       id: fill-type-transactions-table
-      author: ilya
+      author: Bobkov Ilya
       changes:
           - insert:
-              tableName: type-transactions
+              tableName: transactions_type
               columns:
                 - column:
                     name: type
                     value: DEPOSIT
           - insert:
-              tableName: type-transactions
+              tableName: transactions_type
               columns:
                 - column:
                     name: type
                     value: WITHDRAWAL
           - insert:
-              tableName: type-transactions
+              tableName: transactions_type
               columns:
                 - column:
                     name: type
                     value: TRANSFER
           - insert:
-              tableName: type-transactions
+              tableName: transactions_type
               columns:
                 - column:
                     name: type
                     value: PAYMENT
           - insert:
-              tableName: type-transactions
+              tableName: transactions_type
               columns:
                 - column:
                     name: type

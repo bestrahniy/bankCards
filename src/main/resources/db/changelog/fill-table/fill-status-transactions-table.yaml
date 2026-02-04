@@ -1,28 +1,28 @@
 databaseChangeLog:
   - changeSet:
       id: fill-status-transactions-table
-      author: ilya
+      author: Bobkov Ilya
       changes:
           - insert:
-              tableName: status-transactions
+              tableName: status_transactions
               columns:
                 - column:
                     name: status
                     value: PENDING
           - insert:
-              tableName: status-transactions
+              tableName: status_transactions
               columns:
                 - column:
                     name: status
                     value: PROCESSING
           - insert:
-              tableName: status-transactions
+              tableName: status_transactions
               columns:
                 - column:
                     name: status
                     value: COMPLETED
           - insert:
-              tableName: status-transactions
+              tableName: status_transactions
               columns:
                 - column:
                     name: status

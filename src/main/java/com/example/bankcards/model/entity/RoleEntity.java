@@ -29,7 +29,7 @@ public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false, unique = true)
-    private Integer id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, unique = true)
@@ -40,6 +40,6 @@ public class RoleEntity {
     private Boolean isActive = true;
 
     @ManyToMany(mappedBy = "roles")
-    private List<Users> users;
+    private List<UsersEntity> users;
 
 }

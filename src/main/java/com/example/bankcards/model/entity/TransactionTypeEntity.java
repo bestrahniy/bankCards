@@ -2,8 +2,6 @@ package com.example.bankcards.model.entity;
 
 import java.util.List;
 
-import org.hibernate.query.sqm.CastType;
-
 import com.example.bankcards.model.enums.TransactionsType;
 
 import jakarta.persistence.CascadeType;
@@ -33,7 +31,7 @@ public class TransactionTypeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false, unique = true)
-    private Integer id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, unique = true)

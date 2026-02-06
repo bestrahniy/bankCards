@@ -1,7 +1,6 @@
 package com.example.bankcards.model.entity;
 
 import java.security.Timestamp;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;

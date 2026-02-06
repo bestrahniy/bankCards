@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
-public class Users implements UserDetails{
+public class UsersEntity implements UserDetails {
 
     @Id
     @GeneratedValue
@@ -54,7 +54,7 @@ public class Users implements UserDetails{
     @Column(name = "is_active", columnDefinition = "boolean", nullable = false)
     private boolean isActive = true;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -76,7 +76,7 @@ public class Users implements UserDetails{
         orphanRemoval = true,
         fetch = FetchType.EAGER
     )
-    private List<RefreshToken> refreshTokens;
+    private List<RefreshTokenEntity> refreshTokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

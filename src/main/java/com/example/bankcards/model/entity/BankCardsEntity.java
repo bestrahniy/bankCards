@@ -48,7 +48,7 @@ public class BankCardsEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private UsersEntity user;
 
     @OneToOne(
         mappedBy = "bankCardsEntity",

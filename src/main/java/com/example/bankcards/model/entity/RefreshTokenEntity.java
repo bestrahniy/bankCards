@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Table(name = "refresh_token")
-public class RefreshToken {
+public class RefreshTokenEntity {
 
     @Id
     @GeneratedValue
@@ -44,6 +44,6 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private UsersEntity user;
 
 }

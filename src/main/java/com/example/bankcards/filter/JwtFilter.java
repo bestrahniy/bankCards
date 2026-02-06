@@ -58,16 +58,25 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.info("Context user details: " + userDetails);
                 boolean isTokenValidated = jwtHelper.validateToken(jwt, userDetails);
                 log.info("Is token validated: " + isTokenValidated);
+
                 if (isTokenValidated) {
                     log.info("UerDetails authorities: " + userDetails.getAuthorities());
+    
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities()
+                    );
+
+                    usernamePasswordAuthenticationToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    
+                    log.debug("User {} authenticated successfully", login);
+                } else {
+                    log.warn("Invalid JWT token for user: {}", login);
                 }
-            } else {
-                log.error("Bearer token not set correctly");
-                throw new BadCredentialsException("Bearer token not set correctly");
             }
         } catch (ExpiredJwtException jwtException) {
             log.error("JWT token expired: {}", jwtException.getMessage());

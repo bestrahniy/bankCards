@@ -1,3 +1,6 @@
+server:
+  port: 8085
+
 spring:
   application:
     name: bankcards
@@ -18,7 +21,7 @@ spring:
 springdoc:
     api-docs:
         path: /api-docs
-    packages-to-scan: java.com.example.bankcards.controller
+    packages-to-scan: com.example.bankcards.controller
 
     swagger-ui:
         path: /swagger-ui.html

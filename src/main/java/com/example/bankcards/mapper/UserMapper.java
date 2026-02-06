@@ -1,5 +1,6 @@
 package com.example.bankcards.mapper;
 
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import com.example.bankcards.dto.request.RegistrationRequest;
 import com.example.bankcards.dto.response.UserResponse;
@@ -29,7 +30,9 @@ public class UserMapper {
             .login(usersEntity.getLogin())
             .email(usersEntity.getEmail())
             .craetedAt(usersEntity.getCreatedAt())
-            .roles(usersEntity.getRoles())
+            .roles(usersEntity.getRoles().stream()
+                    .map(role -> role.toString())
+                    .collect(Collectors.toSet()))
             .build();
     }
 

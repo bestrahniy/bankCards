@@ -33,12 +33,13 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 request -> request
                     .requestMatchers(
-                        "/api/auth/login/**",
+                        "/api/user/signup",
+                        "/api/user/signin",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/api-docs",
-                        "/api-docs/**"
+                        "/api-docs/**",
+                        "/actuator/health",
+                        "/actuator/info"
                     ).permitAll()
                     .anyRequest().authenticated())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

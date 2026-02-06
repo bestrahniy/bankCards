@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-payment-transactions-table-01
+      id: create-payment-transactions-table
       author: Bobkov Ilya
       changes:
         - createTable:

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-type-transactions-table-01
+      id: create-type-transactions-table
       author: Bobkov Ilya
       changes:
         - createTable:

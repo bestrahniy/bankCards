@@ -32,6 +32,11 @@ jwt:
   access-token-expiration: 900
   refresh-token-expiration: 864000
 
+encryption:
+  aes:
+    secret-key: r1ZCk3k8K2eYJm4QeGz0PqZ9YFhYVxY3dZK6k8n8xR0=
+    iv-length: 12
+
 logging:
   file:
     name: logs/bankcards-app.log

@@ -7,10 +7,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.example.bankcards.dto.request.AuthorizationRequest;
 import com.example.bankcards.dto.request.RegistrationRequest;
-import com.example.bankcards.dto.response.CreateCardNotificationResponse;
+import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.UserResponse;
 import com.example.bankcards.exception.UserNotFoundException;
 import com.example.bankcards.jwt.JwtCreator;
@@ -86,7 +85,7 @@ public class UserService {
     }
 
     @Transactional
-    public CreateCardNotificationResponse createCardRequest(UserDetails userDetails) {
+    public NotificationResponse createCardRequest(UserDetails userDetails) {
         UsersEntity user = usersRepository.findByLoginWithRoles(userDetails.getUsername())
             .orElseThrow(() -> new UserNotFoundException(userDetails.getUsername()));
 

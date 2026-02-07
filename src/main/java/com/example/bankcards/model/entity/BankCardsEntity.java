@@ -32,11 +32,11 @@ public class BankCardsEntity {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "number", columnDefinition = "VARCHAR(19)", nullable = false, unique = true)
+    @Column(name = "number", columnDefinition = "text", nullable = false, unique = true)
     private String number;
 
     @Column(name = "CVC2", columnDefinition = "smallint", unique = false, nullable = false)
-    private Short cvc2;
+    private Integer cvc2;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMPTZ", unique = false, nullable = false)
     private Instant createdAt;

@@ -8,12 +8,9 @@ import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
 import com.example.bankcards.service.AdminService;
-import com.example.bankcards.service.UserService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,12 +20,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Testcontainers
@@ -61,7 +54,6 @@ public class AdminServiceIntegrationTest {
     @Autowired
     private AdminService adminService;
 
-    private UsersEntity admin;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +68,6 @@ public class AdminServiceIntegrationTest {
                 .roles(Set.of(roleAdmin, roleUser))
                 .build();
 
-            admin = user;
             usersRepository.save(user);
         }
 
@@ -90,7 +81,6 @@ public class AdminServiceIntegrationTest {
                 .roles(Set.of(roleUser))
                 .build();
 
-            admin = user;
             usersRepository.save(user);
         }
     }

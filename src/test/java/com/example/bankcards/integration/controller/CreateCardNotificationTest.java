@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
-public class CardCreateNotificationTest {
+public class CreateCardNotificationTest {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
@@ -106,7 +106,7 @@ public class CardCreateNotificationTest {
                 });
     }
 
-   @Test
+    @Test
     void createCardRequest_WithAdminAndUserRolesInToken_ShouldReturnOk() throws Exception {
         String token = jwtCreatorConfigTest.createToken(testUser);
 

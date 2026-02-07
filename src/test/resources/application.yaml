@@ -22,6 +22,11 @@ jwt:
   access-token-expiration: 900
   refresh-token-expiration: 864000
 
+encryption:
+  aes:
+    secret-key: dGhpc2lzYTI1NmJpdHNlY3JldGtleWZvcmFlc3Rlc3Q=
+    iv-length: 12
+
 logging:
   level:
     com.example.bankcards: DEBUG

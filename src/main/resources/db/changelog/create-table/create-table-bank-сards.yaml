@@ -16,7 +16,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: number
-                  type: VARCHAR(19)
+                  type: text
                   constraints:
                     nullable: false
                     unique: true

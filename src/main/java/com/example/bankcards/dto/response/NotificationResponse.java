@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class CreateCardNotificationResponse {
+public class NotificationResponse {
 
     private String login;
 

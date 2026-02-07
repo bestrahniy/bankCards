@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bankcards.dto.request.AuthorizationRequest;
 import com.example.bankcards.dto.request.RegistrationRequest;
-import com.example.bankcards.dto.response.CreateCardNotificationResponse;
+import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.UserResponse;
 import com.example.bankcards.service.UserService;
 
@@ -37,7 +37,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN') and hasRole('USER')")
     @PostMapping("/cards/request/create")
-    public CreateCardNotificationResponse createCard(@AuthenticationPrincipal UserDetails userDetails) {
+    public NotificationResponse createCard(@AuthenticationPrincipal UserDetails userDetails) {
         return userService.createCardRequest(userDetails);
     }
 

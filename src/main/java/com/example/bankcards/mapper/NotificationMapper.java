@@ -2,7 +2,7 @@ package com.example.bankcards.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.example.bankcards.dto.response.CreateCardNotificationResponse;
+import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.model.entity.NotificationEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.EventType;
@@ -18,10 +18,10 @@ public class NotificationMapper {
             .build();
     }
 
-    public CreateCardNotificationResponse toDto(UsersEntity user, NotificationEntity notification) {
-        return CreateCardNotificationResponse.builder()
+    public NotificationResponse toDto(UsersEntity user, NotificationEntity notification) {
+        return NotificationResponse.builder()
             .login(user.getLogin())
-            .notification(CreateCardNotificationResponse.NotificationDto.builder()
+            .notification(NotificationResponse.NotificationDto.builder()
                 .id(notification.getId())
                 .event(notification.getEvent().toString())
                 .createdAt(notification.getCreatedAt())

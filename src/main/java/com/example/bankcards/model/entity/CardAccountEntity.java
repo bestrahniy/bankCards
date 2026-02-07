@@ -19,13 +19,15 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "card_accaunt")
+@Table(name = "card_account")
 @Builder
 public class CardAccountEntity {
 
@@ -47,9 +49,20 @@ public class CardAccountEntity {
     @OneToMany(
         mappedBy = "senderCardAccountId",
         cascade = CascadeType.ALL,
-        fetch = FetchType.LAZY,
+        fetch = FetchType.EAGER,
         orphanRemoval = true
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<PaymentTransactionsEntity> paymentTransactionsEntities;
 
+    @OneToMany(
+        mappedBy = "card",
+        cascade = CascadeType.ALL,
+        fetch = FetchType.EAGER,
+        orphanRemoval = true
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<NotificationEntity> notificationEntities;
 }

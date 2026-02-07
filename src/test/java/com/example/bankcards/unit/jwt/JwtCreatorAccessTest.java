@@ -14,6 +14,7 @@ import com.example.bankcards.exception.RolesEmptyException;
 import com.example.bankcards.exception.UserEntityNullException;
 import com.example.bankcards.jwt.JwtCreator;
 import com.example.bankcards.jwt.JwtHelper;
+import com.example.bankcards.mapper.RefreshTokenMapper;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
@@ -29,12 +30,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JwtCreatorTest {
+class JwtCreatorAccessTest {
 
     private JwtCreator jwtCreator;
 
     @Mock
     private JwtHelper jwtHelper;
+
+    @Mock
+    private RefreshTokenMapper refreshTokenMapper;
 
     private SecretKey secretKey;
 
@@ -42,8 +46,9 @@ class JwtCreatorTest {
 
     @BeforeEach
     void setUp() {
-        jwtCreator = new JwtCreator(jwtHelper);
-        ReflectionTestUtils.setField(jwtCreator, "accessTokenAxparation", "300");
+        jwtCreator = new JwtCreator(jwtHelper, refreshTokenMapper);
+        ReflectionTestUtils.setField(jwtCreator, "accessTokenExpiration", "300");
+        ReflectionTestUtils.setField(jwtCreator, "refreshTokenExpiration", "900");
 
         byte[] keyBytes = "9f3c8b2a1d4e7f6a5c8d0e2b9a4f6c7d1e8b3a5f0c9d2e6a7b4f8c1d5e".getBytes();
         secretKey = Keys.hmacShaKeyFor(keyBytes);

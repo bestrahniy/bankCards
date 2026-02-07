@@ -53,7 +53,7 @@ databaseChangeLog:
                     nullable: false
 
         - addForeignKeyConstraint:
-            constraintName: fk_card_accaunt_payment_transactions
+            constraintName: fk_card_account_payment_transactions
             baseColumnNames: sender_card_account_id
             baseTableName: payment_transactions
             onDelete: CASCADE

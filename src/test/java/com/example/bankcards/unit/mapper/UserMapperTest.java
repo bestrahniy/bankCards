@@ -81,7 +81,7 @@ class UserMapperTest {
         assertEquals(userId, result.getId());
         assertEquals("testUser", result.getLogin());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals(createdAt, result.getCraetedAt());
+        assertEquals(createdAt, result.getCreatedAt());
         assertEquals(roles, result.getRoles());
     }
 
@@ -105,7 +105,7 @@ class UserMapperTest {
         assertEquals(userId, result.getId());
         assertEquals("testUser", result.getLogin());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals(createdAt, result.getCraetedAt());
+        assertEquals(createdAt, result.getCreatedAt());
         assertNull(result.getRoles());
     }
 
@@ -127,7 +127,7 @@ class UserMapperTest {
         assertEquals(userId, result.getId());
         assertEquals("testUser", result.getLogin());
         assertEquals("test@example.com", result.getEmail());
-        assertNull(result.getCraetedAt());
+        assertNull(result.getCreatedAt());
         assertThat(result.getRoles()).isEmpty();
     }
 
@@ -153,7 +153,7 @@ class UserMapperTest {
         assertNull(result.getId());
         assertNull(result.getLogin());
         assertNull(result.getEmail());
-        assertNull(result.getCraetedAt());
+        assertNull(result.getCreatedAt());
         assertNull(result.getRoles());
     }
 
@@ -182,7 +182,7 @@ class UserMapperTest {
         assertEquals(userId, result.getId());
         assertEquals("testUser", result.getLogin());
         assertEquals("test@example.com", result.getEmail());
-        assertEquals(createdAt, result.getCraetedAt());
+        assertEquals(createdAt, result.getCreatedAt());
         assertEquals(roles, result.getRoles());
     }
 

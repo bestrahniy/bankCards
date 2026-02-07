@@ -9,5 +9,5 @@ import com.example.bankcards.model.enums.RoleType;
 public interface RoleRepository extends JpaRepository<RoleEntity, Long>{
 
     List<RoleEntity> findByRole(RoleType role);
-    
+
 }

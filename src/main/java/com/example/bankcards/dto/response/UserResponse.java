@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
@@ -15,17 +16,24 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserResponse {
 
+    @NonNull
     private UUID id;
 
+    @NonNull
     private String login;
 
+    @NonNull
     private String email;
 
+    @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
             timezone = "UTC")
-    private Instant craetedAt;
+    private Instant createdAt;
 
+    @NonNull
     private Set<String> roles;
+
+    private String jwt;
 
 }

@@ -1,5 +1,6 @@
 package com.example.bankcards.model.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.bankcards.model.enums.TransactionsType;

@@ -16,7 +16,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
@@ -30,7 +32,7 @@ public class BankCardsEntity {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "number", columnDefinition = "UUID", nullable = false, unique = true)
+    @Column(name = "number", columnDefinition = "VARCHAR(19)", nullable = false, unique = true)
     private String number;
 
     @Column(name = "CVC2", columnDefinition = "smallint", unique = false, nullable = false)
@@ -48,6 +50,8 @@ public class BankCardsEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private UsersEntity user;
 
     @OneToOne(
@@ -56,6 +60,8 @@ public class BankCardsEntity {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private CardAccountEntity cardAccountEntity;
 
 }

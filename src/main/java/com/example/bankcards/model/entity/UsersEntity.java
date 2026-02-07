@@ -2,6 +2,7 @@ package com.example.bankcards.model.entity;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +24,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Builder
 @Data
@@ -60,7 +63,9 @@ public class UsersEntity implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<RoleEntity> roles;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<RoleEntity> roles = new HashSet<>();
 
     @OneToMany(
         mappedBy = "user",
@@ -68,6 +73,8 @@ public class UsersEntity implements UserDetails {
         orphanRemoval = true,
         fetch = FetchType.EAGER
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<BankCardsEntity> bankCardsEntities;
 
     @OneToMany(
@@ -76,12 +83,24 @@ public class UsersEntity implements UserDetails {
         orphanRemoval = true,
         fetch = FetchType.EAGER
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<RefreshTokenEntity> refreshTokens;
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<NotificationEntity> notificationEntities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole().toString()))
                 .toList();
     }
 

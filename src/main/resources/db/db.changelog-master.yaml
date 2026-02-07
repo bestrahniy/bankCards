@@ -16,7 +16,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/create-table/create-table-refresh-token.yaml
   - include:
-      file: db/changelog/create-table/create-table-user-role-token.yaml
+      file: db/changelog/create-table/create-table-user-role.yaml
+  - include:
+      file: db/changelog/create-table/create-table-notification.yaml
   - include:
       file: db/changelog/fill-table/fill-role-table.yaml
   - include:

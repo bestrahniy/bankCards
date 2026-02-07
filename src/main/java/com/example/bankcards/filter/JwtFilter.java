@@ -38,11 +38,23 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        final String authorizationHeader = request.getHeader(AUTHORIZATION);
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         log.info("Inside Jwt filter");
+
         try {
-            final String authorizationHeader = request.getHeader(AUTHORIZATION);
-            String jwt = null;
-            String login = null;
+            String jwt = authorizationHeader.substring(7);
+            log.info("JWT Token ONLY: {}", jwt);
+
+            String login = jwtHelper.extractLogin(jwt);
+
+            log.info("Security Context: {}", SecurityContextHolder.getContext().getAuthentication());
 
             if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);

@@ -44,7 +44,7 @@ class UserControllerTest {
                 .id(UUID.randomUUID())
                 .login("testuser")
                 .email("test@example.com")
-                .craetedAt(Instant.now())
+                .createdAt(Instant.now())
                 .roles(null)
                 .build();
     }

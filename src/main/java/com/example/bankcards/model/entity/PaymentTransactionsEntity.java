@@ -1,6 +1,7 @@
 package com.example.bankcards.model.entity;
 
 import java.security.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -53,6 +54,6 @@ public class PaymentTransactionsEntity {
 
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "TIMESTAMPTZ", nullable = false)
-    private Timestamp createdat;
+    private Instant createdAt;
 
 }

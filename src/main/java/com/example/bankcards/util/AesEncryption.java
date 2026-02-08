@@ -1,7 +1,9 @@
 package com.example.bankcards.util;
 
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -32,7 +34,7 @@ public class AesEncryption {
 
     public String encrypt(String cardNumber) {
         try {
-            byte[] iv = generateSecureRandomBytes(IV_LENGTH);
+            byte[] iv = deriveIVFromCardNumber(cardNumber);
             
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(TAG_LENGTH, iv);
@@ -83,10 +85,15 @@ public class AesEncryption {
         secretKey = new SecretKeySpec(decodedKey, KEY_ALGORITHM);
     }
 
-    private byte[] generateSecureRandomBytes(int length) {
-        byte[] bytes = new byte[length];
-        new SecureRandom().nextBytes(bytes);
-        return bytes;
+    private byte[] deriveIVFromCardNumber(String cardNumber) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest((cardNumber + encryptionKey).getBytes("UTF-8"));
+            return Arrays.copyOf(hash, IV_LENGTH);
+        } catch (Exception e) {
+            throw new EncryptionException("Failed to derive IV");
+        }
     }
+
 
 }

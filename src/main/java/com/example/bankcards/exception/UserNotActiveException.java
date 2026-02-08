@@ -8,4 +8,8 @@ public class UserNotActiveException extends RuntimeException {
         super(String.format("User with id: %s is not active", userId.toString()));
     }
 
+    public UserNotActiveException(String login) {
+        super(String.format("User with login: %s is not active", login));
+    }
+
 }

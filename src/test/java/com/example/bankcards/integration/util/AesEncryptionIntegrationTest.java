@@ -14,14 +14,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import com.example.bankcards.model.entity.BankCardsEntity;
+
+import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.repository.BankCardsRepository;
 import com.example.bankcards.util.AesEncryption;
 import com.example.bankcards.util.AesHelper;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -44,6 +42,9 @@ class AesEncryptionIntegrationTest {
     @Autowired
     private AesEncryption aesEncryption;
 
+    @Autowired
+    private SecurityFacade securityFacade;
+
     @Mock
     private BankCardsRepository bankCardsRepository;
 
@@ -53,7 +54,7 @@ class AesEncryptionIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        aesHelper = new AesHelper(aesEncryption, bankCardsRepository);
+        aesHelper = new AesHelper(aesEncryption);
     }
 
     @Test
@@ -96,41 +97,6 @@ class AesEncryptionIntegrationTest {
         assertEquals(emptyCardNumber, decrypted);
     }
 
-
-    @Test
-    void testCheckActiveCard() {
-        BankCardsEntity activeCard = mock(BankCardsEntity.class);
-        when(activeCard.getIsActive()).thenReturn(true);
-        
-        BankCardsEntity inactiveCard = mock(BankCardsEntity.class);
-        when(inactiveCard.getIsActive()).thenReturn(false);
-
-        Boolean activeResult = aesHelper.checkActiveCard(activeCard);
-        Boolean inactiveResult = aesHelper.checkActiveCard(inactiveCard);
-
-        assertTrue(activeResult);
-        assertFalse(inactiveResult);
-    }
-
-    @Test
-    void testCheckExpiresCard() {
-        BankCardsEntity notExpiredCard = mock(BankCardsEntity.class);
-        when(notExpiredCard.getExpiresAt()).thenReturn(
-            LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant()
-        );
-        
-        BankCardsEntity expiredCard = mock(BankCardsEntity.class);
-        when(expiredCard.getExpiresAt()).thenReturn(
-            LocalDateTime.now().minusDays(1).atZone(ZoneId.systemDefault()).toInstant()
-        );
-
-        Boolean notExpiredResult = aesHelper.checkExpiresCard(notExpiredCard);
-        Boolean expiredResult = aesHelper.checkExpiresCard(expiredCard);
-
-        assertFalse(notExpiredResult, "Card should not be expired");
-        assertTrue(expiredResult, "Card should be expired");
-    }
-
     @Test
     void testGetMaskedCardNumber_ValidCard() {
         String encryptedData = aesEncryption.encrypt(TEST_CARD_NUMBER);
@@ -168,21 +134,6 @@ class AesEncryptionIntegrationTest {
         String masked = aesHelper.getMaskedCardNumber(encryptedCard);
 
         assertEquals("**** **** **** 6789", masked);
-    }
-
-    private BankCardsEntity createMockBankCard(boolean isActive, boolean isExpired) {
-        BankCardsEntity entity = mock(BankCardsEntity.class);
-        when(entity.getIsActive()).thenReturn(isActive);
-        
-        LocalDateTime expiresAt = isExpired ?
-            LocalDateTime.now().minusDays(1) :
-            LocalDateTime.now().plusDays(1);
-        
-        when(entity.getExpiresAt()).thenReturn(
-            expiresAt.atZone(ZoneId.systemDefault()).toInstant()
-        );
-        
-        return entity;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.bankcards.service;
-import com.example.bankcards.util.AesEncryption;
-import lombok.RequiredArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,8 +37,6 @@ import com.example.bankcards.repository.UsersRepository;
 @Service
 @RequiredArgsConstructor
 public class AdminService {
-
-    private final AesEncryption aesEncryption;
 
     private final UserMapper userMapper;
 
@@ -85,9 +82,8 @@ public class AdminService {
         return userMapper.toDto(user);
     }
 
-    public PageResponse<NotificationResponse> getUserActiveNotifications(
-            int page, int size) {
-        
+    public PageResponse<NotificationResponse> getUserActiveNotifications(int page, int size) {
+
         Pageable pageable = PageRequest.of(
                 page,
                 size,
@@ -96,7 +92,7 @@ public class AdminService {
 
         Page<NotificationEntity> pageResult = notificationRepository.findAllByIsActiveTrue(pageable);
         
-        return pageMapper.toDto(pageResult);
+        return pageMapper.toDtoNotification(pageResult);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -125,7 +121,7 @@ public class AdminService {
 
         user.getBankCardsEntities().add(bankCard);
 
-        return bankCardMapper.toDto(bankCard);
+        return bankCardMapper.toDtoCreateCardResponse(bankCard);
     }
 
     private Boolean checkUser(UsersEntity usersEntity) {

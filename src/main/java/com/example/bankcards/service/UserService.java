@@ -26,12 +26,12 @@ import com.example.bankcards.dto.response.CreateTransactionResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
 import com.example.bankcards.dto.response.UserResponse;
-import com.example.bankcards.exception.AmountIsSmallException;
-import com.example.bankcards.exception.BankCardNotAvailableException;
-import com.example.bankcards.exception.BankCardNotEnoughFundsException;
-import com.example.bankcards.exception.BankCardNotFoundException;
-import com.example.bankcards.exception.UserNotActiveException;
-import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.exception.bankCardException.BankCardNotAvailableException;
+import com.example.bankcards.exception.bankCardException.BankCardNotEnoughFundsException;
+import com.example.bankcards.exception.bankCardException.BankCardNotFoundException;
+import com.example.bankcards.exception.requestException.AmountIsSmallException;
+import com.example.bankcards.exception.userException.UserNotActiveException;
+import com.example.bankcards.exception.userException.UserNotFoundException;
 import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.jwt.JwtCreator;
 import com.example.bankcards.mapper.BankCardMapper;
@@ -109,7 +109,7 @@ public class UserService {
 
         usersRepository.save(user);
 
-        return userMapper.toDto(user);
+        return userMapper.toDtoUserResponse(user);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -127,7 +127,7 @@ public class UserService {
         String jwtToken = jwtCreator.createJwt(user);
         refreshTokenService.createRefershToken(user);
 
-        return userMapper.toDto(user, jwtToken);
+        return userMapper.toDtoUserResponse(user, jwtToken);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

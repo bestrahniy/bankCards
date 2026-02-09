@@ -63,9 +63,6 @@ public class CardCreateTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-        registry.add("encryption.aes.secret-key", () -> "dGhpc2lzYTI1NmJpdHNlY3JldGtleWZvcmFlc3Rlc3Q=");
-        registry.add("encryption.aes.iv-length", () -> "12");
     }
 
     @Autowired
@@ -160,7 +157,7 @@ public class CardCreateTest {
     void createCard_Success() throws Exception {
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -184,7 +181,7 @@ public class CardCreateTest {
         String nonAdminToken = jwtCreatorConfig.createToken(nonAdminUser);
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + nonAdminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -194,7 +191,7 @@ public class CardCreateTest {
     void createCard_EncryptedCardNumber_Success() throws Exception {
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -217,7 +214,7 @@ public class CardCreateTest {
     void createCard_CardAccountCreated_Success() throws Exception {
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -239,7 +236,7 @@ public class CardCreateTest {
     void createCard_ResponseFormat_Correct() throws Exception {
         UUID userId = regularUser.getId();
 
-        String response = mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        String response = mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -257,7 +254,7 @@ public class CardCreateTest {
         UUID userId = regularUser.getId();
         String invalidToken = "invalid.token.here";
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + invalidToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -267,7 +264,7 @@ public class CardCreateTest {
     void createCard_NoToken_ShouldReturn401() throws Exception {
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -278,7 +275,7 @@ public class CardCreateTest {
         String multiRoleToken = jwtCreatorConfig.createToken(userWithMultipleRoles);
         UUID userId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{userId}/card/create", userId)
+        mockMvc.perform(post("/api/admin/card/create/{userId}", userId)
                         .header("Authorization", "Bearer " + multiRoleToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

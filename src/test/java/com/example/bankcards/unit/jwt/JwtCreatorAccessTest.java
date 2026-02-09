@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.example.bankcards.exception.RolesEmptyException;
-import com.example.bankcards.exception.UserEntityNullException;
+import com.example.bankcards.exception.requestException.RolesEmptyException;
+import com.example.bankcards.exception.userException.UserNullException;
 import com.example.bankcards.jwt.JwtCreator;
 import com.example.bankcards.jwt.JwtHelper;
 import com.example.bankcards.mapper.RefreshTokenMapper;
@@ -97,7 +97,7 @@ class JwtCreatorAccessTest {
     
     @Test
     void createJwt_WithNullUser_ThrowsException() {
-        assertThrows(UserEntityNullException.class, () -> {
+        assertThrows(UserNullException.class, () -> {
             jwtCreator.createJwt(null);
         });
     }

@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
-import com.example.bankcards.exception.BankCardNotFoundException;
+import com.example.bankcards.exception.bankCardException.BankCardNotFoundException;
 import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.repository.BankCardsRepository;
 import lombok.RequiredArgsConstructor;

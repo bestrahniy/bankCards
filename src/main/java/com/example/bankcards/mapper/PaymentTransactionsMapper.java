@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.example.bankcards.dto.request.TransferRequest;
 import com.example.bankcards.dto.response.CreateTransactionResponse;
-import com.example.bankcards.exception.TransactionStatusNotFoundException;
-import com.example.bankcards.exception.TransactionTypeNotFoundException;
+import com.example.bankcards.exception.transactionException.TransactionStatusNotFoundException;
+import com.example.bankcards.exception.transactionException.TransactionTypeNotFoundException;
 import com.example.bankcards.model.entity.CardAccountEntity;
 import com.example.bankcards.model.entity.PaymentTransactionsEntity;
 import com.example.bankcards.model.enums.TransactionsStatusType;

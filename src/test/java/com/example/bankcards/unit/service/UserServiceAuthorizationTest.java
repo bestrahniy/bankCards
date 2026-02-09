@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.example.bankcards.dto.request.AuthorizationRequest;
 import com.example.bankcards.dto.response.UserResponse;
-import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.exception.userException.UserNotFoundException;
 import com.example.bankcards.jwt.JwtCreator;
 import com.example.bankcards.mapper.UserMapper;
 import com.example.bankcards.model.entity.UsersEntity;
@@ -60,7 +60,7 @@ class UserServiceAuthorizationTest {
         
         when(usersRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
         when(jwtCreator.createJwt(user)).thenReturn("jwt-token");
-        when(userMapper.toDto(user, "jwt-token")).thenReturn(expectedResponse);
+        when(userMapper.toDtoUserResponse(user, "jwt-token")).thenReturn(expectedResponse);
 
         UserResponse result = userService.authorizationUser(request);
 
@@ -71,7 +71,7 @@ class UserServiceAuthorizationTest {
         verify(usersRepository, times(1)).findByLogin("testuser");
         verify(jwtCreator, times(1)).createJwt(user);
         verify(refreshTokenService, times(1)).createRefershToken(user);
-        verify(userMapper, times(1)).toDto(user, "jwt-token");
+        verify(userMapper, times(1)).toDtoUserResponse(user, "jwt-token");
     }
 
     @Test
@@ -89,7 +89,7 @@ class UserServiceAuthorizationTest {
         verify(usersRepository, times(1)).findByLogin("nonexistent");
         verify(jwtCreator, never()).createJwt(any());
         verify(refreshTokenService, never()).createRefershToken(any());
-        verify(userMapper, never()).toDto(any(), any());
+        verify(userMapper, never()).toDtoUserResponse(any(), any());
     }
 
     @Test

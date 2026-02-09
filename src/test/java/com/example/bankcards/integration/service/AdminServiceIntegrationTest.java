@@ -1,7 +1,7 @@
 package com.example.bankcards.integration.service;
 
 import com.example.bankcards.dto.response.UserResponse;
-import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.exception.userException.UserNotFoundException;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;

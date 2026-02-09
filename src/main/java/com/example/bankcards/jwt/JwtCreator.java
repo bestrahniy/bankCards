@@ -7,10 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import com.example.bankcards.dto.request.CreateRefreshTokenRequest;
-import com.example.bankcards.exception.RolesEmptyException;
-import com.example.bankcards.exception.UserEntityNullException;
+import com.example.bankcards.exception.requestException.RolesEmptyException;
+import com.example.bankcards.exception.userException.UserNullException;
 import com.example.bankcards.mapper.RefreshTokenMapper;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
@@ -34,7 +33,7 @@ public class JwtCreator {
     public String createJwt(UsersEntity usersEntity) {
 
         if (usersEntity == null) {
-            throw new UserEntityNullException();
+            throw new UserNullException();
         }
 
         Instant now = Instant.now();
@@ -60,7 +59,7 @@ public class JwtCreator {
 
     public CreateRefreshTokenRequest createRefresh(UsersEntity user) {
         if (user == null) {
-            throw new UserEntityNullException();
+            throw new UserNullException();
         }
 
         Instant now = Instant.now();

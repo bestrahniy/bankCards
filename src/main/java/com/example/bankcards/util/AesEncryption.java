@@ -12,7 +12,9 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.example.bankcards.exception.EncryptionException;
+
+import com.example.bankcards.exception.encryprionExceprion.EncryptionException;
+
 import jakarta.annotation.PostConstruct;
 
 @Component

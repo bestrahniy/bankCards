@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import com.example.bankcards.dto.request.RegistrationRequest;
+import com.example.bankcards.dto.response.UserActiveResponse;
 import com.example.bankcards.dto.response.UserResponse;
 import com.example.bankcards.model.entity.UsersEntity;
 
@@ -22,7 +23,7 @@ public class UserMapper {
             .build();
     }
 
-    public UserResponse toDto(UsersEntity usersEntity) {
+    public UserResponse toDtoUserResponse(UsersEntity usersEntity) {
         if (usersEntity == null) {
             return null;
         }
@@ -39,7 +40,7 @@ public class UserMapper {
             .build();
     }
 
-    public UserResponse toDto(UsersEntity usersEntity, String jwtToken) {
+    public UserResponse toDtoUserResponse(UsersEntity usersEntity, String jwtToken) {
         if (usersEntity == null) {
             return null;
         }
@@ -53,6 +54,13 @@ public class UserMapper {
                     .map(role -> role.toString())
                     .collect(Collectors.toSet()))
             .jwt(jwtToken)
+            .build();
+    }
+
+    public UserActiveResponse toDtoUserActiveResponse(UsersEntity usersEntity) {
+        return UserActiveResponse.builder()
+            .login(usersEntity.getLogin())
+            .isActive(usersEntity.isActive())
             .build();
     }
 

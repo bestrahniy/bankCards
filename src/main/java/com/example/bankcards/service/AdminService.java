@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bankcards.dto.request.CardNumberRequest;
@@ -18,9 +17,10 @@ import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
+import com.example.bankcards.dto.response.UserActiveResponse;
 import com.example.bankcards.dto.response.UserResponse;
-import com.example.bankcards.exception.UserNotActiveException;
-import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.exception.userException.UserNotActiveException;
+import com.example.bankcards.exception.userException.UserNotFoundException;
 import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.mapper.BankCardMapper;
 import com.example.bankcards.mapper.CardAccountMapper;
@@ -62,7 +62,6 @@ public class AdminService {
 
     private final BankCardsRepository bankCardsRepository;
 
-    @SuppressWarnings("null")
     @Transactional
     public UserResponse grantAdminRole(UUID userId) {
         UsersEntity user = usersRepository.findById(userId)
@@ -85,7 +84,7 @@ public class AdminService {
         user.setRoles(roles);
         usersRepository.save(user);
 
-        return userMapper.toDto(user);
+        return userMapper.toDtoUserResponse(user);
     }
 
     public PageResponse<NotificationResponse> getUserActiveNotifications(int page, int size) {
@@ -101,7 +100,7 @@ public class AdminService {
         return pageMapper.toDtoNotification(pageResult);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public CreateCardResponse createCard(UUID userId) {
         UsersEntity user = usersRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
@@ -130,18 +129,36 @@ public class AdminService {
         return bankCardMapper.toDtoCreateCardResponse(bankCard);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public CardActiveStatusResponse blockCard(CardNumberRequest cardNumberRequest) {
         BankCardsEntity bankCard = securityFacade.findBankCardByNumber(cardNumberRequest.getCardNumber());
         bankCard.setIsActive(false);
         return bankCardMapper.toDtoCardActiveStatusResponse(bankCard);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public CardActiveStatusResponse unblockCard(CardNumberRequest cardNumberRequest) {
         BankCardsEntity bankCard = securityFacade.findBankCardByNumber(cardNumberRequest.getCardNumber());
         bankCard.setIsActive(true);
         return bankCardMapper.toDtoCardActiveStatusResponse(bankCard);
+    }
+
+    @Transactional
+    public UserActiveResponse blockUser(UUID userId) {
+        UsersEntity usersEntity = usersRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
+        usersEntity.setActive(false);
+        return userMapper.toDtoUserActiveResponse(usersEntity);
+    }
+
+    @Transactional
+    public UserActiveResponse unblockUser(UUID userId) {
+        UsersEntity usersEntity = usersRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
+        usersEntity.setActive(true);
+        return userMapper.toDtoUserActiveResponse(usersEntity);
     }
 
     private Boolean checkUser(UsersEntity usersEntity) {

@@ -75,7 +75,7 @@ class UserMapperTest {
                 .refreshTokens(null)
                 .build();
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertNotNull(result);
         assertEquals(userId, result.getId());
@@ -99,7 +99,7 @@ class UserMapperTest {
                 .password("hashedPassword")
                 .build();
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertNotNull(result);
         assertEquals(userId, result.getId());
@@ -121,7 +121,7 @@ class UserMapperTest {
                 .roles(Set.of())
                 .build();
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertNotNull(result);
         assertEquals(userId, result.getId());
@@ -133,7 +133,7 @@ class UserMapperTest {
 
     @Test
     void toDto_shouldHandleNullUsersEntity() {
-        UserResponse result = userMapper.toDto(null);
+        UserResponse result = userMapper.toDtoUserResponse(null);
         assertNull(result);
     }
 
@@ -147,7 +147,7 @@ class UserMapperTest {
                 .roles(null)
                 .build();
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertNotNull(result);
         assertNull(result.getId());
@@ -177,7 +177,7 @@ class UserMapperTest {
         entity.setPassword("hashedPassword");
         entity.setActive(true);
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertEquals(userId, result.getId());
         assertEquals("testUser", result.getLogin());
@@ -196,7 +196,7 @@ class UserMapperTest {
                 .roles(Set.of())
                 .build();
 
-        UserResponse result = userMapper.toDto(entity);
+        UserResponse result = userMapper.toDtoUserResponse(entity);
 
         assertThat(result)
                 .hasFieldOrPropertyWithValue("id", entity.getId())

@@ -3,7 +3,7 @@ package com.example.bankcards.mapper;
 import java.util.Date;
 import org.springframework.stereotype.Component;
 import com.example.bankcards.dto.request.CreateRefreshTokenRequest;
-import com.example.bankcards.exception.RequestIsNullException;
+import com.example.bankcards.exception.requestException.RequestIsNullException;
 import com.example.bankcards.model.entity.RefreshTokenEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 

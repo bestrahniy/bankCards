@@ -8,6 +8,7 @@ import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
+import com.example.bankcards.dto.response.UserActiveResponse;
 import com.example.bankcards.dto.response.UserResponse;
 import com.example.bankcards.service.AdminService;
 import jakarta.validation.constraints.Max;
@@ -44,7 +45,7 @@ public class AdminController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{userId}/card/create")
+    @PostMapping("/card/create/{userId}")
     public CreateCardResponse createCard(@PathVariable(name = "userId") UUID userId) {
         return adminService.createCard(userId);
     }
@@ -59,6 +60,18 @@ public class AdminController {
     @PostMapping("/card/unblock")
     public CardActiveStatusResponse unblockCard(@RequestBody CardNumberRequest cardNumberRequest) {
         return adminService.unblockCard(cardNumberRequest);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/user/{user_id}/block")
+    public UserActiveResponse blockUser(@PathVariable(name = "user_id") UUID userId) {
+        return adminService.blockUser(userId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/user/{user_id}/unblock")
+    public UserActiveResponse unblockUser(@PathVariable(name = "user_id") UUID userId) {
+        return adminService.unblockUser(userId);
     }
 
 }

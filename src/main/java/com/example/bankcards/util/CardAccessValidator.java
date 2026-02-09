@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Date;
 
 import org.springframework.stereotype.Service;
+
+import com.example.bankcards.exception.BankCardNotFoundException;
 import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.repository.BankCardsRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +18,14 @@ public class CardAccessValidator {
 
     private final AesEncryption aesEncryption;
 
+    public BankCardsEntity findBankCardByNumber(String cardNumber) {
+        String encryptedCardNumber = aesEncryption.encrypt(cardNumber);
+        return bankCardsRepository.findByNumber(encryptedCardNumber)
+            .orElseThrow(() -> new BankCardNotFoundException(cardNumber));
+    }
+
     public Boolean checkCard(String currentNumber) throws IllegalAccessException {
-        String currentHash = aesEncryption.encrypt(currentNumber);
-
-        BankCardsEntity bankCard = bankCardsRepository.findByNumber(currentHash)
-            .orElseThrow(() -> new IllegalAccessException("bank card is not found"));
-
+        BankCardsEntity bankCard = findBankCardByNumber(currentNumber);
         return checkActiveCard(bankCard) && checkExpiresCard(bankCard);
     }
 

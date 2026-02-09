@@ -3,6 +3,7 @@ package com.example.bankcards.facade;
 import org.springframework.stereotype.Service;
 
 import com.example.bankcards.config.SecurityContextService;
+import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.util.CardAccessValidator;
 
@@ -31,4 +32,9 @@ public class SecurityFacade {
     public String getLogin() {
         return contextService.getLogin();
     }
+
+    public BankCardsEntity findBankCardByNumber(String cardNumber) {
+        return cardValidator.findBankCardByNumber(cardNumber);
+    }
+
 }

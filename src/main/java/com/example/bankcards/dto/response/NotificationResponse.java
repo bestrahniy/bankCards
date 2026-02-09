@@ -26,9 +26,12 @@ public class NotificationResponse {
 
         private String event;
 
+        private String cardNumber;
+
         private Instant createdAt;
 
         private Boolean isActive;
+
     }
 
 }

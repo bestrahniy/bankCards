@@ -1,8 +1,8 @@
 package com.example.bankcards.mapper;
 
 import org.springframework.stereotype.Component;
-
 import com.example.bankcards.dto.response.NotificationResponse;
+import com.example.bankcards.model.entity.CardAccountEntity;
 import com.example.bankcards.model.entity.NotificationEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.EventType;
@@ -15,6 +15,14 @@ public class NotificationMapper {
             .event(EventType.CREATE_CARD)
             .user(user)
             .card(null)
+            .build();
+    }
+
+    public NotificationEntity toEntity(UsersEntity user, CardAccountEntity cardAccount) {
+        return NotificationEntity.builder()
+            .event(EventType.BLOCK_CARD)
+            .user(user)
+            .card(cardAccount)
             .build();
     }
 

@@ -8,10 +8,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CardResponse;
+import com.example.bankcards.dto.response.CardStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
 import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.model.entity.CardAccountEntity;
+import com.example.bankcards.model.entity.PaymentTransactionsEntity;
 import com.example.bankcards.util.AesEncryption;
 import com.example.bankcards.util.AesHelper;
 
@@ -57,6 +60,38 @@ public class BankCardMapper {
                 bankCardsEntity.getNumber()))
             .expiredAt(bankCardsEntity.getExpiresAt())
             .build();
+    }
+
+    public CardStatusResponse toDtoCardStatusResponse(BankCardsEntity bankCardsEntity) {
+        CardAccountEntity cardAccountEntity = bankCardsEntity.getCardAccountEntity();
+
+        return CardStatusResponse.builder()
+            .currentBalance(cardAccountEntity.getCurrentBalance())
+            .paymentTransaction(
+                cardAccountEntity.getPaymentTransactionsEntities().stream()
+                    .map(this::mapToPaymentTransaction)
+                    .toList()
+            )
+            .build();
+    }
+
+    public CardActiveStatusResponse toDtoCardActiveStatusResponse(BankCardsEntity bankCardsEntity) {
+        return CardActiveStatusResponse.builder()
+            .cardNumber(aesHelper.getMaskedCardNumber(bankCardsEntity.getNumber()))
+            .isActive(bankCardsEntity.getIsActive())
+            .build();
+    }
+
+    private CardStatusResponse.PaymentTransaction mapToPaymentTransaction(PaymentTransactionsEntity paymentTransaction) {
+    return CardStatusResponse.PaymentTransaction.builder()
+        .senderCardId(paymentTransaction.getSenderCardAccountId().getId())
+        .recipientCardId(paymentTransaction.getRecipientAccountId())
+        .comment(paymentTransaction.getComment())
+        .amount(paymentTransaction.getAmount())
+        .type(paymentTransaction.getTransactionType().getTransactionsType().toString())
+        .status(paymentTransaction.getTransactionsStatus().getTransactionsStatus().toString())
+        .createdAt(paymentTransaction.getCreatedAt())
+        .build();
     }
 
 }

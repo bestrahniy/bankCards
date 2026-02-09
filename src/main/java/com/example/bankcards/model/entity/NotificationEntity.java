@@ -1,17 +1,9 @@
 package com.example.bankcards.model.entity;
 
-import java.security.Timestamp;
 import java.time.Instant;
-import java.util.List;
-
-import org.apache.commons.lang3.builder.EqualsExclude;
-import org.hibernate.annotations.Collate;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-
 import com.example.bankcards.model.enums.EventType;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

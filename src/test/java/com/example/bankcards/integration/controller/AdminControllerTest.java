@@ -132,7 +132,7 @@ public class AdminControllerTest {
 
         UUID targetUserId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", targetUserId)
+        mockMvc.perform(post("/api/admin//grant-admin/{user_id}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -149,7 +149,7 @@ public class AdminControllerTest {
     void grantAdminRole_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
         UUID targetUserId = regularUser.getId();
     
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", targetUserId)
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(regularUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -158,14 +158,14 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldNotDuplicateAdminRole_WhenUserAlreadyHasAdminRole() throws Exception {
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser)))
                 .andExpect(status().isOk());
 
         UsersEntity userAfterFirstCall = usersRepository.findById(regularUser.getId()).orElseThrow();
         int rolesCountAfterFirstCall = userAfterFirstCall.getRoles().size();
 
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser)))
                 .andExpect(status().isOk());
 
@@ -183,7 +183,7 @@ public class AdminControllerTest {
     void grantAdminRole_ShouldReturnCorrectResponseStructure() throws Exception {
         UUID targetUserId = anotherUser.getId();
 
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", targetUserId)
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -199,7 +199,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnUnauthorized_WhenNoAuthorizationHeader() throws Exception {
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -207,7 +207,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnUnauthorized_WhenInvalidToken() throws Exception {
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
                         .header("Authorization", "Bearer invalid_token_here")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -216,7 +216,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnBadRequest_WhenInvalidUserIdFormat() throws Exception {
-        mockMvc.perform(post("/api/admin/{user_id}/grant-admin", "not-a-uuid")
+        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", "not-a-uuid")
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

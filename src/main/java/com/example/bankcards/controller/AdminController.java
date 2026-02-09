@@ -2,6 +2,9 @@ package com.example.bankcards.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.bankcards.dto.request.CardNumberRequest;
+import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -25,7 +30,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{user_id}/grant-admin")
+    @PostMapping("/grant-admin/{user_id}")
     public UserResponse postMethodName(@PathVariable(name = "user_id") UUID userId) {
         return adminService.grantAdminRole(userId);
     }
@@ -42,6 +47,18 @@ public class AdminController {
     @PostMapping("/{userId}/card/create")
     public CreateCardResponse createCard(@PathVariable(name = "userId") UUID userId) {
         return adminService.createCard(userId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/card/block")
+    public CardActiveStatusResponse blockCard(@RequestBody CardNumberRequest cardNumberRequest) {
+        return adminService.blockCard(cardNumberRequest);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/card/unblock")
+    public CardActiveStatusResponse unblockCard(@RequestBody CardNumberRequest cardNumberRequest) {
+        return adminService.unblockCard(cardNumberRequest);
     }
 
 }

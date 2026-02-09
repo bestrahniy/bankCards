@@ -15,4 +15,5 @@ public class CardAccountMapper {
             .updatedAt(Instant.now())
             .build();
     }
+
 }

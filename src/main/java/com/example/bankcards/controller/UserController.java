@@ -4,9 +4,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bankcards.dto.request.AuthorizationRequest;
+import com.example.bankcards.dto.request.CardNumberRequest;
 import com.example.bankcards.dto.request.RegistrationRequest;
 import com.example.bankcards.dto.request.TransferRequest;
 import com.example.bankcards.dto.response.CardResponse;
+import com.example.bankcards.dto.response.CardStatusResponse;
 import com.example.bankcards.dto.response.CreateTransactionResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
@@ -60,8 +62,20 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN') and hasRole('USER')")
     @PostMapping("/cards/transfer")
-    public CreateTransactionResponse trsnsfer(@RequestBody TransferRequest transferRequest) throws IllegalAccessException {
+    public CreateTransactionResponse transfer(@RequestBody TransferRequest transferRequest) throws IllegalAccessException {
         return userService.transfer(transferRequest);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') and hasRole('USER')")
+    @GetMapping("/cards/balance")
+    public CardStatusResponse checkBalance(@RequestBody CardNumberRequest cardNumberRequest) throws IllegalAccessException {
+        return userService.checkBalance(cardNumberRequest);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') and hasRole('USER')")
+    @PostMapping("/cards/request/block")
+    public NotificationResponse blockCard(@RequestBody CardNumberRequest cardNumberRequest) {
+        return userService.createBlockRequest(cardNumberRequest);
     }
 
 }

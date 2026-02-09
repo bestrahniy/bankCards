@@ -12,12 +12,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.example.bankcards.dto.request.CardNumberRequest;
+import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
 import com.example.bankcards.dto.response.UserResponse;
 import com.example.bankcards.exception.UserNotActiveException;
 import com.example.bankcards.exception.UserNotFoundException;
+import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.mapper.BankCardMapper;
 import com.example.bankcards.mapper.CardAccountMapper;
 import com.example.bankcards.mapper.PageMapper;
@@ -37,6 +41,8 @@ import com.example.bankcards.repository.UsersRepository;
 @Service
 @RequiredArgsConstructor
 public class AdminService {
+
+    private final SecurityFacade securityFacade;
 
     private final UserMapper userMapper;
 
@@ -122,6 +128,20 @@ public class AdminService {
         user.getBankCardsEntities().add(bankCard);
 
         return bankCardMapper.toDtoCreateCardResponse(bankCard);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CardActiveStatusResponse blockCard(CardNumberRequest cardNumberRequest) {
+        BankCardsEntity bankCard = securityFacade.findBankCardByNumber(cardNumberRequest.getCardNumber());
+        bankCard.setIsActive(false);
+        return bankCardMapper.toDtoCardActiveStatusResponse(bankCard);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CardActiveStatusResponse unblockCard(CardNumberRequest cardNumberRequest) {
+        BankCardsEntity bankCard = securityFacade.findBankCardByNumber(cardNumberRequest.getCardNumber());
+        bankCard.setIsActive(true);
+        return bankCardMapper.toDtoCardActiveStatusResponse(bankCard);
     }
 
     private Boolean checkUser(UsersEntity usersEntity) {

@@ -14,7 +14,7 @@ import com.example.bankcards.exception.requestException.RolesEmptyException;
 import com.example.bankcards.exception.userException.UserNullException;
 import com.example.bankcards.jwt.JwtCreator;
 import com.example.bankcards.jwt.JwtHelper;
-import com.example.bankcards.mapper.RefreshTokenMapper;
+import com.example.bankcards.mapper.RefreshTokenMapperImpl;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
@@ -38,7 +38,7 @@ class JwtCreatorAccessTest {
     private JwtHelper jwtHelper;
 
     @Mock
-    private RefreshTokenMapper refreshTokenMapper;
+    private RefreshTokenMapperImpl refreshTokenMapper;
 
     private SecretKey secretKey;
 

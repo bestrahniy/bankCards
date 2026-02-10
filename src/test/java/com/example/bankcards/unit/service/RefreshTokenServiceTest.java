@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.bankcards.dto.request.CreateRefreshTokenRequest;
 import com.example.bankcards.jwt.JwtCreator;
-import com.example.bankcards.mapper.RefreshTokenMapper;
+import com.example.bankcards.mapper.RefreshTokenMapperImpl;
 import com.example.bankcards.model.entity.RefreshTokenEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.repository.RefreshTokenRepository;
@@ -28,7 +28,7 @@ class RefreshTokenServiceTest {
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
     @Mock
-    private RefreshTokenMapper refreshTokenMapper;
+    private RefreshTokenMapperImpl refreshTokenMapper;
     @InjectMocks
     private RefreshTokenService refreshTokenService;
     private UsersEntity testUser;

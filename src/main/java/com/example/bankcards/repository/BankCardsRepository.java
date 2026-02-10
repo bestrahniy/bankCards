@@ -22,5 +22,4 @@ public interface BankCardsRepository extends JpaRepository<BankCardsEntity, UUID
     @Query("SELECT b FROM BankCardsEntity b WHERE b.user = :user AND b.isActive = true")
     Page<BankCardsEntity> findActiveCardsByUser(@Param("user") UsersEntity user, Pageable pageable);
 
-
 }

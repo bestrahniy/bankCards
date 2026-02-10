@@ -1,6 +1,7 @@
 package com.example.bankcards.integration.controller;
 
 import com.example.bankcards.config.JwtCreatorConfigTest;
+import com.example.bankcards.crypto.AesEncryption;
 import com.example.bankcards.dto.request.CardNumberRequest;
 import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.facade.SecurityFacade;
@@ -16,7 +17,6 @@ import com.example.bankcards.repository.CardAccountRepository;
 import com.example.bankcards.repository.NotificationRepository;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.util.AesEncryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,48 +116,58 @@ public class CardBlockNotificationControllerTest {
         cardAccountRepository.deleteAll();
         usersRepository.deleteAll();
 
-        // Создаем роли
         userRole = roleRepository.findByRole(RoleType.USER)
                 .stream()
                 .findFirst()
-                .orElseGet(() -> roleRepository.save(
-                        RoleEntity.builder().role(RoleType.USER).build()));
+                .orElseGet(() -> roleRepository.save(RoleEntity.builder()
+                        .role(RoleType.USER)
+                        .isActive(true)
+                        .build()));
         
         adminRole = roleRepository.findByRole(RoleType.ADMIN)
                 .stream()
                 .findFirst()
-                .orElseGet(() -> roleRepository.save(
-                        RoleEntity.builder().role(RoleType.ADMIN).build()));
+                .orElseGet(() -> roleRepository.save(RoleEntity.builder()
+                        .role(RoleType.ADMIN)
+                        .isActive(true)
+                        .build()));
 
-        // Создаем пользователя с ролями ADMIN и USER
-        testUser = UsersEntity.builder()
-                .login("blockUser")
-                .email("block@example.com")
-                .password(passwordEncoder.encode("pass123"))
-                .createdAt(Instant.now())
-                .isActive(true)
-                .build();
-        
-        testUser.setRoles(new HashSet<>());
-        testUser.getRoles().add(adminRole);
-        testUser.getRoles().add(userRole);
-        testUser = usersRepository.save(testUser);
+        testUser = createUserWithRoles("testUser", "test@example.com", "password123", adminRole, userRole);
 
         userToken = jwtCreatorConfig.createToken(testUser);
 
-        // Создаем тестовую карту
-        testCard = createCardForUser(testUser, testCardNumber, 1500.0);
+        testCard = createCardForUser(testUser, testCardNumber, 1000.0);
 
-        // Настраиваем моки
         when(securityFacade.checkCard(anyString())).thenReturn(true);
         when(securityFacade.isCurrentActive()).thenReturn(true);
         when(securityFacade.getCurrentUser()).thenReturn(testUser);
         when(securityFacade.getLogin()).thenReturn(testUser.getLogin());
+        when(securityFacade.findBankCardByNumber(testCardNumber)).thenReturn(testCard);
     }
 
-    private BankCardsEntity createCardForUser(UsersEntity user, String cardNumber, Double balance) {
+    private UsersEntity createUserWithRoles(String login, String email, String password, RoleEntity... roles) {
+        UsersEntity user = UsersEntity.builder()
+                .login(login)
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .createdAt(Instant.now())
+                .isActive(true)
+                .build();
+
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+
+        for (RoleEntity role : roles) {
+            user.getRoles().add(role);
+        }
+
+        return usersRepository.save(user);
+    }
+
+    private BankCardsEntity createCardForUser(UsersEntity user, String cardNumber, Double initialBalance) {
         CardAccountEntity cardAccount = CardAccountEntity.builder()
-                .currentBalance(balance)
+                .currentBalance(initialBalance)
                 .updatedAt(Instant.now())
                 .paymentTransactionsEntities(new java.util.ArrayList<>())
                 .notificationEntities(new java.util.ArrayList<>())
@@ -206,12 +216,12 @@ public class CardBlockNotificationControllerTest {
         assertNotNull(response.getNotification().getCreatedAt());
         assertTrue(response.getNotification().getIsActive());
         
-        // Проверяем, что уведомление сохранилось в БД
         List<NotificationEntity> notifications = notificationRepository.findAll();
         assertEquals(1, notifications.size());
         
         NotificationEntity savedNotification = notifications.get(0);
         assertEquals(testUser.getId(), savedNotification.getUser().getId());
+        assertNotNull(savedNotification.getCard());
         assertEquals(testCard.getCardAccountEntity().getId(), savedNotification.getCard().getId());
         assertEquals(EventType.BLOCK_CARD, savedNotification.getEvent());
         assertTrue(savedNotification.isActive());
@@ -223,38 +233,34 @@ public class CardBlockNotificationControllerTest {
                 .cardNumber(testCardNumber)
                 .build();
 
-        // Первый запрос
         mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Второй запрос (должен создавать новое уведомление)
         mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Проверяем, что создано два уведомления
         List<NotificationEntity> notifications = notificationRepository.findAll();
         assertEquals(2, notifications.size());
         
-        // Оба уведомления должны быть активными
         assertTrue(notifications.get(0).isActive());
         assertTrue(notifications.get(1).isActive());
         
-        // Оба уведомления должны быть для одного пользователя и карты
         assertEquals(testUser.getId(), notifications.get(0).getUser().getId());
         assertEquals(testUser.getId(), notifications.get(1).getUser().getId());
+        assertNotNull(notifications.get(0).getCard());
+        assertNotNull(notifications.get(1).getCard());
         assertEquals(testCard.getCardAccountEntity().getId(), notifications.get(0).getCard().getId());
         assertEquals(testCard.getCardAccountEntity().getId(), notifications.get(1).getCard().getId());
     }
 
     @Test
     void blockCard_WithoutAdminRole_ShouldReturn403() throws Exception {
-        // Создаем пользователя только с ролью USER
         UsersEntity userRoleOnly = UsersEntity.builder()
                 .login("userOnly")
                 .email("user@example.com")
@@ -272,6 +278,9 @@ public class CardBlockNotificationControllerTest {
                 .cardNumber(testCardNumber)
                 .build();
 
+        when(securityFacade.getCurrentUser()).thenReturn(userRoleOnly);
+        when(securityFacade.getLogin()).thenReturn(userRoleOnly.getLogin());
+
         mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userOnlyToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -281,7 +290,6 @@ public class CardBlockNotificationControllerTest {
 
     @Test
     void blockCard_WithoutUserRole_ShouldReturn403() throws Exception {
-        // Создаем пользователя только с ролью ADMIN
         UsersEntity adminRoleOnly = UsersEntity.builder()
                 .login("adminOnly")
                 .email("admin@example.com")
@@ -298,6 +306,9 @@ public class CardBlockNotificationControllerTest {
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(testCardNumber)
                 .build();
+
+        when(securityFacade.getCurrentUser()).thenReturn(adminRoleOnly);
+        when(securityFacade.getLogin()).thenReturn(adminRoleOnly.getLogin());
 
         mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + adminOnlyToken)
@@ -333,11 +344,11 @@ public class CardBlockNotificationControllerTest {
 
     @Test
     void blockCard_DifferentCards_Success() throws Exception {
-        // Создаем вторую карту
         String secondCardNumber = "8765432187654321";
         BankCardsEntity secondCard = createCardForUser(testUser, secondCardNumber, 2000.0);
 
-        // Блокируем первую карту
+        when(securityFacade.findBankCardByNumber(secondCardNumber)).thenReturn(secondCard);
+
         CardNumberRequest request1 = CardNumberRequest.builder()
                 .cardNumber(testCardNumber)
                 .build();
@@ -354,7 +365,6 @@ public class CardBlockNotificationControllerTest {
         NotificationResponse response1 = objectMapper.readValue(response1Json, NotificationResponse.class);
         assertEquals(EventType.BLOCK_CARD.toString(), response1.getNotification().getEvent());
 
-        // Блокируем вторую карту
         CardNumberRequest request2 = CardNumberRequest.builder()
                 .cardNumber(secondCardNumber)
                 .build();
@@ -371,24 +381,25 @@ public class CardBlockNotificationControllerTest {
         NotificationResponse response2 = objectMapper.readValue(response2Json, NotificationResponse.class);
         assertEquals(EventType.BLOCK_CARD.toString(), response2.getNotification().getEvent());
 
-        // Проверяем, что создано два уведомления для разных карт
         List<NotificationEntity> notifications = notificationRepository.findAll();
         assertEquals(2, notifications.size());
+        assertNotNull(notifications.get(0).getCard());
+        assertNotNull(notifications.get(1).getCard());
         assertNotEquals(notifications.get(0).getCard().getId(), notifications.get(1).getCard().getId());
     }
 
     @Test
     void blockCard_ExpiredCard_ShouldStillCreateNotification() throws Exception {
-        // Создаем просроченную карту
         String expiredCardNumber = "5555666677778888";
         BankCardsEntity expiredCard = createExpiredCard(testUser, expiredCardNumber, 1000.0);
-        
+
+        when(securityFacade.findBankCardByNumber(expiredCardNumber)).thenReturn(expiredCard);
+        when(securityFacade.checkCard(expiredCardNumber)).thenReturn(false);
+
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(expiredCardNumber)
                 .build();
 
-        // Запрос должен пройти успешно, т.к. метод создает уведомление, 
-        // а не проверяет доступность карты
         String responseJson = mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -400,24 +411,25 @@ public class CardBlockNotificationControllerTest {
 
         NotificationResponse response = objectMapper.readValue(responseJson, NotificationResponse.class);
         assertEquals(EventType.BLOCK_CARD.toString(), response.getNotification().getEvent());
-        
-        // Проверяем, что уведомление создано для просроченной карты
+
         List<NotificationEntity> notifications = notificationRepository.findAll();
         assertEquals(1, notifications.size());
+        assertNotNull(notifications.get(0).getCard());
         assertEquals(expiredCard.getCardAccountEntity().getId(), notifications.get(0).getCard().getId());
     }
 
     @Test
     void blockCard_InactiveCard_ShouldStillCreateNotification() throws Exception {
-        // Создаем неактивную карту
         String inactiveCardNumber = "4444333322221111";
         BankCardsEntity inactiveCard = createInactiveCard(testUser, inactiveCardNumber, 1000.0);
-        
+
+        when(securityFacade.findBankCardByNumber(inactiveCardNumber)).thenReturn(inactiveCard);
+        when(securityFacade.checkCard(inactiveCardNumber)).thenReturn(false);
+
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(inactiveCardNumber)
                 .build();
 
-        // Запрос должен пройти успешно
         String responseJson = mockMvc.perform(post("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -429,48 +441,11 @@ public class CardBlockNotificationControllerTest {
 
         NotificationResponse response = objectMapper.readValue(responseJson, NotificationResponse.class);
         assertEquals(EventType.BLOCK_CARD.toString(), response.getNotification().getEvent());
-        
-        // Проверяем, что уведомление создано для неактивной карты
-        List<NotificationEntity> notifications = notificationRepository.findAll();
-        assertEquals(1, notifications.size());
-        assertEquals(inactiveCard.getCardAccountEntity().getId(), notifications.get(0).getCard().getId());
-    }
 
-    @Test
-    void blockCard_UserTriesToBlockOtherUsersCard_ShouldReturn404() throws Exception {
-        // Создаем второго пользователя
-        UsersEntity anotherUser = UsersEntity.builder()
-                .login("anotherUser")
-                .email("another@example.com")
-                .password(passwordEncoder.encode("pass123"))
-                .createdAt(Instant.now())
-                .isActive(true)
-                .build();
-        anotherUser.setRoles(new HashSet<>());
-        anotherUser.getRoles().add(adminRole);
-        anotherUser.getRoles().add(userRole);
-        usersRepository.save(anotherUser);
-        
-        // Создаем карту для второго пользователя
-        String anotherUserCardNumber = "9999888877776666";
-        createCardForUser(anotherUser, anotherUserCardNumber, 2000.0);
-        
-        // Наш тестовый пользователь пытается заблокировать карту другого пользователя
-        CardNumberRequest request = CardNumberRequest.builder()
-                .cardNumber(anotherUserCardNumber)
-                .build();
-        
-        // findBankCardByNumber найдет карту, т.к. поиск идет только по номеру
-        // Но в реальном приложении должна быть дополнительная проверка на владение картой
-        mockMvc.perform(post("/api/user/cards/request/block")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()); // Пропустит, если нет проверки на владение
-        
-        // Проверяем, что уведомление создалось
         List<NotificationEntity> notifications = notificationRepository.findAll();
         assertEquals(1, notifications.size());
+        assertNotNull(notifications.get(0).getCard());
+        assertEquals(inactiveCard.getCardAccountEntity().getId(), notifications.get(0).getCard().getId());
     }
 
     @Test
@@ -479,7 +454,6 @@ public class CardBlockNotificationControllerTest {
                 .cardNumber(testCardNumber)
                 .build();
 
-        // Пробуем GET вместо POST
         mockMvc.perform(get("/api/user/cards/request/block")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -499,17 +473,76 @@ public class CardBlockNotificationControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        // Проверяем связи
         NotificationEntity notification = notificationRepository.findAll().get(0);
-        
-        // Уведомление связано с CardAccount, а не напрямую с BankCard
+
+        assertNotNull(notification.getCard());
         assertEquals(testCard.getCardAccountEntity().getId(), notification.getCard().getId());
         assertEquals(testUser.getId(), notification.getUser().getId());
-        
-        // Проверяем, что уведомление добавлено в коллекцию CardAccount
+
         CardAccountEntity cardAccount = cardAccountRepository.findById(testCard.getCardAccountEntity().getId()).orElseThrow();
         assertFalse(cardAccount.getNotificationEntities().isEmpty());
         assertTrue(cardAccount.getNotificationEntities().contains(notification));
+    }
+
+    @Test
+    void blockCard_CardWithExistingNotifications_ShouldAddNewNotification() throws Exception {
+        CardNumberRequest request = CardNumberRequest.builder()
+                .cardNumber(testCardNumber)
+                .build();
+
+        mockMvc.perform(post("/api/user/cards/request/block")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/user/cards/request/block")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        CardAccountEntity cardAccount = cardAccountRepository.findById(testCard.getCardAccountEntity().getId()).orElseThrow();
+        assertEquals(2, cardAccount.getNotificationEntities().size());
+
+        for (NotificationEntity notification : cardAccount.getNotificationEntities()) {
+            assertEquals(EventType.BLOCK_CARD, notification.getEvent());
+        }
+    }
+
+    @Test
+    void blockCard_UserTriesToBlockOtherUsersCard_ShouldStillCreateNotification() throws Exception {
+        UsersEntity anotherUser = UsersEntity.builder()
+                .login("anotherUser")
+                .email("another@example.com")
+                .password(passwordEncoder.encode("pass123"))
+                .createdAt(Instant.now())
+                .isActive(true)
+                .build();
+        anotherUser.setRoles(new HashSet<>());
+        anotherUser.getRoles().add(adminRole);
+        anotherUser.getRoles().add(userRole);
+        usersRepository.save(anotherUser);
+
+        String anotherUserCardNumber = "9999888877776666";
+        BankCardsEntity anotherUserCard = createCardForUser(anotherUser, anotherUserCardNumber, 2000.0);
+
+        when(securityFacade.findBankCardByNumber(anotherUserCardNumber)).thenReturn(anotherUserCard);
+
+        CardNumberRequest request = CardNumberRequest.builder()
+                .cardNumber(anotherUserCardNumber)
+                .build();
+
+        mockMvc.perform(post("/api/user/cards/request/block")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        List<NotificationEntity> notifications = notificationRepository.findAll();
+        assertEquals(1, notifications.size());
+        assertEquals(anotherUserCard.getCardAccountEntity().getId(), notifications.get(0).getCard().getId());
+        assertEquals(testUser.getId(), notifications.get(0).getUser().getId());
     }
 
     @Test
@@ -532,44 +565,12 @@ public class CardBlockNotificationControllerTest {
         Instant afterRequest = Instant.now().plusSeconds(1);
         
         NotificationResponse response = objectMapper.readValue(responseJson, NotificationResponse.class);
-        
-        // Проверяем, что createdAt в пределах ожидаемого времени
+
         assertNotNull(response.getNotification().getCreatedAt());
         assertTrue(response.getNotification().getCreatedAt().isAfter(beforeRequest));
         assertTrue(response.getNotification().getCreatedAt().isBefore(afterRequest));
     }
 
-    @Test
-    void blockCard_CardWithExistingNotifications_ShouldAddNewNotification() throws Exception {
-        CardNumberRequest request = CardNumberRequest.builder()
-                .cardNumber(testCardNumber)
-                .build();
-
-        // Создаем первое уведомление
-        mockMvc.perform(post("/api/user/cards/request/block")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
-
-        // Создаем второе уведомление
-        mockMvc.perform(post("/api/user/cards/request/block")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
-
-        // Проверяем, что в CardAccount теперь два уведомления
-        CardAccountEntity cardAccount = cardAccountRepository.findById(testCard.getCardAccountEntity().getId()).orElseThrow();
-        assertEquals(2, cardAccount.getNotificationEntities().size());
-        
-        // Оба уведомления должны быть типа BLOCK_CARD
-        for (NotificationEntity notification : cardAccount.getNotificationEntities()) {
-            assertEquals(EventType.BLOCK_CARD, notification.getEvent());
-        }
-    }
-
-    // Вспомогательные методы для создания тестовых карт
     private BankCardsEntity createExpiredCard(UsersEntity user, String cardNumber, Double balance) {
         CardAccountEntity cardAccount = CardAccountEntity.builder()
                 .currentBalance(balance)
@@ -585,7 +586,7 @@ public class CardBlockNotificationControllerTest {
                 .number(encryptedCardNumber)
                 .cvc2(123)
                 .createdAt(Instant.now().minus(365 * 6, ChronoUnit.DAYS))
-                .expiresAt(Instant.now().minus(1, ChronoUnit.DAYS)) // ПРОСРОЧЕНА
+                .expiresAt(Instant.now().minus(1, ChronoUnit.DAYS))
                 .isActive(true)
                 .user(user)
                 .cardAccountEntity(cardAccount)
@@ -611,7 +612,7 @@ public class CardBlockNotificationControllerTest {
                 .cvc2(123)
                 .createdAt(Instant.now())
                 .expiresAt(Instant.now().plus(365 * 5, ChronoUnit.DAYS))
-                .isActive(false) // НЕ АКТИВНА
+                .isActive(false)
                 .user(user)
                 .cardAccountEntity(cardAccount)
                 .build();

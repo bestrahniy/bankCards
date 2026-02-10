@@ -6,17 +6,17 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.example.bankcards.dto.request.CreateRefreshTokenRequest;
-import com.example.bankcards.mapper.RefreshTokenMapper;
+import com.example.bankcards.mapper.RefreshTokenMapperImpl;
 import com.example.bankcards.model.entity.RefreshTokenEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 
 class RefreshTokenMapperTest {
 
-    private RefreshTokenMapper refreshTokenMapper;
+    private RefreshTokenMapperImpl refreshTokenMapper;
 
     @BeforeEach
     void setUp() {
-        refreshTokenMapper = new RefreshTokenMapper();
+        refreshTokenMapper = new RefreshTokenMapperImpl();
     }
 
     @Test

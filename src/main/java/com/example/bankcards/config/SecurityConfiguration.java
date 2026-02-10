@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import com.example.bankcards.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 
@@ -32,10 +31,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 request -> request
                     .requestMatchers(
-                        "/api/user/signup/**",
-                        "/api/user/signin/**",
-                        "/api/user/signup",
-                        "/api/user/signin",
+                        "/api/user/**",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
                         "/api-docs/**",

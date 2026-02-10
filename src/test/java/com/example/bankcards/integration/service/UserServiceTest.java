@@ -7,7 +7,8 @@ import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.service.UserService;
+import com.example.bankcards.service.UserRegistrationServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ class UserServiceTest {
     }
 
     @Autowired
-    private UserService userService;
+    private UserRegistrationServiceImpl userRegistrationService;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -72,7 +73,7 @@ class UserServiceTest {
                 .email("integration@example.com")
                 .build();
 
-        UserResponse response = userService.registerUser(request);
+        UserResponse response = userRegistrationService.registerUser(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isNotNull();
@@ -97,7 +98,7 @@ class UserServiceTest {
                 .email("role@example.com")
                 .build();
 
-        UserResponse response = userService.registerUser(request);
+        UserResponse response = userRegistrationService.registerUser(request);
 
         UsersEntity user = usersRepository.findById(response.getId()).orElseThrow();
         assertThat(user.getRoles())
@@ -119,8 +120,8 @@ class UserServiceTest {
                 .email("user2@example.com")
                 .build();
 
-        UserResponse response1 = userService.registerUser(user1);
-        UserResponse response2 = userService.registerUser(user2);
+        UserResponse response1 = userRegistrationService.registerUser(user1);
+        UserResponse response2 = userRegistrationService.registerUser(user2);
 
         assertThat(response1.getId()).isNotEqualTo(response2.getId());
         assertThat(usersRepository.count()).isEqualTo(2);
@@ -135,7 +136,7 @@ class UserServiceTest {
                 .email("password@example.com")
                 .build();
 
-        UserResponse response = userService.registerUser(request);
+        UserResponse response = userRegistrationService.registerUser(request);
 
         UsersEntity user = usersRepository.findById(response.getId()).orElseThrow();
         assertThat(user.getPassword()).isNotEqualTo(rawPassword);
@@ -156,7 +157,7 @@ class UserServiceTest {
                 .email("multi@example.com")
                 .build();
 
-        UserResponse response = userService.registerUser(request);
+        UserResponse response = userRegistrationService.registerUser(request);
 
         List<RoleEntity> userRoles = roleRepository.findByRole(RoleType.USER);
         assertThat(response.getRoles()).hasSize(userRoles.size());
@@ -170,7 +171,7 @@ class UserServiceTest {
                 .email("active@example.com")
                 .build();
 
-        UserResponse response = userService.registerUser(request);
+        UserResponse response = userRegistrationService.registerUser(request);
 
         UsersEntity user = usersRepository.findById(response.getId()).orElseThrow();
         assertThat(user.isActive()).isTrue();
@@ -190,8 +191,8 @@ class UserServiceTest {
                 .email("unique2@example.com")
                 .build();
 
-        UserResponse response1 = userService.registerUser(request1);
-        UserResponse response2 = userService.registerUser(request2);
+        UserResponse response1 = userRegistrationService.registerUser(request1);
+        UserResponse response2 = userRegistrationService.registerUser(request2);
 
         assertThat(response1.getId()).isNotNull();
         assertThat(response2.getId()).isNotNull();

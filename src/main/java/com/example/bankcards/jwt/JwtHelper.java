@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.example.bankcards.model.entity.UsersEntity;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -37,6 +39,16 @@ public class JwtHelper {
         try {
             final String username = extractLogin(token);
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (Exception exception) {
+            log.error("Token validation failed: {}", exception.getMessage());
+            return false;
+        }
+    }
+
+    public Boolean validateToken(String token, UsersEntity usersEntity) {
+        try {
+            final String username = extractLogin(token);
+            return (username.equals(usersEntity.getLogin()) && !isTokenExpired(token));
         } catch (Exception exception) {
             log.error("Token validation failed: {}", exception.getMessage());
             return false;

@@ -22,13 +22,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,9 +39,7 @@ public class AdminControllerTest {
 
     @SuppressWarnings("resource")
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:17")
-    )
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"))
             .withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test");
@@ -132,7 +128,7 @@ public class AdminControllerTest {
 
         UUID targetUserId = regularUser.getId();
 
-        mockMvc.perform(post("/api/admin//grant-admin/{user_id}", targetUserId)
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -149,7 +145,7 @@ public class AdminControllerTest {
     void grantAdminRole_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
         UUID targetUserId = regularUser.getId();
     
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", targetUserId)
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(regularUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -158,14 +154,14 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldNotDuplicateAdminRole_WhenUserAlreadyHasAdminRole() throws Exception {
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", regularUser.getId())
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser)))
                 .andExpect(status().isOk());
 
         UsersEntity userAfterFirstCall = usersRepository.findById(regularUser.getId()).orElseThrow();
         int rolesCountAfterFirstCall = userAfterFirstCall.getRoles().size();
 
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", regularUser.getId())
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser)))
                 .andExpect(status().isOk());
 
@@ -183,7 +179,7 @@ public class AdminControllerTest {
     void grantAdminRole_ShouldReturnCorrectResponseStructure() throws Exception {
         UUID targetUserId = anotherUser.getId();
 
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", targetUserId)
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", targetUserId)
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -199,7 +195,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnUnauthorized_WhenNoAuthorizationHeader() throws Exception {
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", regularUser.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -207,7 +203,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnUnauthorized_WhenInvalidToken() throws Exception {
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", regularUser.getId())
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", regularUser.getId())
                         .header("Authorization", "Bearer invalid_token_here")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -216,7 +212,7 @@ public class AdminControllerTest {
     @Test
     @Transactional
     void grantAdminRole_ShouldReturnBadRequest_WhenInvalidUserIdFormat() throws Exception {
-        mockMvc.perform(post("/api/admin/grant-admin/{user_id}", "not-a-uuid")
+        mockMvc.perform(post("/api/admin/grant-admin/{userId}", "not-a-uuid")
                         .header("Authorization", "Bearer " + jwtCreatorConfigTest.createToken(adminUser))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

@@ -2,10 +2,10 @@ package com.example.bankcards.facade;
 
 import org.springframework.stereotype.Service;
 
-import com.example.bankcards.config.SecurityContextService;
 import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.model.entity.UsersEntity;
-import com.example.bankcards.util.CardAccessValidator;
+import com.example.bankcards.service.CardAccessValidator;
+import com.example.bankcards.service.SecurityContextService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ public class SecurityFacade {
         return contextService.getCurrentUser();
     }
 
-    public Boolean checkCard(String currentNumber) throws IllegalAccessException {
+    public Boolean checkCard(String currentNumber) {
         return cardValidator.checkCard(currentNumber);
     }
 

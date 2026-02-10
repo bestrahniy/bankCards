@@ -2,7 +2,7 @@ package com.example.bankcards.unit.mapper;
 
 import com.example.bankcards.dto.request.RegistrationRequest;
 import com.example.bankcards.dto.response.UserResponse;
-import com.example.bankcards.mapper.UserMapper;
+import com.example.bankcards.mapper.UserMapperImpl;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
 
     @BeforeEach
     void setUp() {
-        userMapper = new UserMapper();
+        userMapper = new UserMapperImpl();
     }
 
     @Test

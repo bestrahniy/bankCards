@@ -36,4 +36,6 @@ public class UserResponse {
 
     private String jwt;
 
+    private String refreshToken;
+
 }

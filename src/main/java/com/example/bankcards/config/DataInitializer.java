@@ -11,7 +11,6 @@ import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

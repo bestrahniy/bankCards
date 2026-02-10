@@ -1,6 +1,7 @@
 package com.example.bankcards.integration.controller;
 
 import com.example.bankcards.config.JwtCreatorConfigTest;
+import com.example.bankcards.crypto.AesHelper;
 import com.example.bankcards.dto.response.CardResponse;
 import com.example.bankcards.dto.response.PageResponse;
 import com.example.bankcards.model.entity.BankCardsEntity;
@@ -12,7 +13,6 @@ import com.example.bankcards.repository.BankCardsRepository;
 import com.example.bankcards.repository.CardAccountRepository;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.util.AesHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

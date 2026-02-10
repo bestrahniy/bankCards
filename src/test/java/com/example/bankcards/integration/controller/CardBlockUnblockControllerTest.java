@@ -1,13 +1,13 @@
 package com.example.bankcards.integration.controller;
 
 import com.example.bankcards.config.JwtCreatorConfigTest;
+import com.example.bankcards.crypto.AesEncryption;
 import com.example.bankcards.dto.request.CardNumberRequest;
 import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.model.entity.*;
 import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.*;
-import com.example.bankcards.util.AesEncryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -493,4 +493,5 @@ public class CardBlockUnblockControllerTest {
         cardAccount.setBankCardsEntity(card);
         return bankCardsRepository.save(card);
     }
+
 }

@@ -1,12 +1,13 @@
 package com.example.bankcards.integration.service;
 
+import com.example.bankcards.crypto.AesEncryption;
 import com.example.bankcards.model.entity.BankCardsEntity;
 import com.example.bankcards.model.entity.CardAccountEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.repository.BankCardsRepository;
 import com.example.bankcards.repository.CardAccountRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.util.AesEncryption;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DatabaseSearchEncryptionTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:17")
-    )
-            .withDatabaseName("search_test_db")
-            .withUsername("test")
-            .withPassword("test");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"))
+        .withDatabaseName("search_test_db")
+        .withUsername("test")
+        .withPassword("test");
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {

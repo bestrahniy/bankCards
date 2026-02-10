@@ -7,7 +7,9 @@ import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.service.AdminService;
+import com.example.bankcards.service.AdminUserServiceImpl;
+import com.example.bankcards.service.interfaces.AdminUserService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AdminServiceIntegrationTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:17")
-    );
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
@@ -52,7 +52,7 @@ public class AdminServiceIntegrationTest {
     private RoleRepository roleRepository;
 
     @Autowired
-    private AdminService adminService;
+    private AdminUserServiceImpl adminService;
 
 
     @BeforeEach

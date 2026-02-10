@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.example.bankcards.dto.request.CreateRefreshTokenRequest;
 import com.example.bankcards.exception.requestException.RolesEmptyException;
 import com.example.bankcards.exception.userException.UserNullException;
-import com.example.bankcards.mapper.RefreshTokenMapper;
+import com.example.bankcards.mapper.RefreshTokenMapperImpl;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import io.jsonwebtoken.Jwts;
@@ -28,7 +28,7 @@ public class JwtCreator {
 
     private final JwtHelper jwtHelper;
 
-    private final RefreshTokenMapper refreshTokenMapper;
+    private final RefreshTokenMapperImpl refreshTokenMapper;
 
     public String createJwt(UsersEntity usersEntity) {
 

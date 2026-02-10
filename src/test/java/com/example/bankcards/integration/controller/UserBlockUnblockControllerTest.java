@@ -132,7 +132,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_Success() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -154,7 +154,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_AlreadyBlocked_ShouldStillSucceed() throws Exception {
         UUID userId = inactiveRegularUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -176,7 +176,7 @@ public class UserBlockUnblockControllerTest {
     void unblockUser_Success() throws Exception {
         UUID userId = inactiveRegularUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/unblock", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/unblock", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -198,7 +198,7 @@ public class UserBlockUnblockControllerTest {
     void unblockUser_AlreadyActive_ShouldStillSucceed() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/unblock", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/unblock", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -220,7 +220,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_UserNotFound_ShouldReturn404() throws Exception {
         UUID nonExistentUserId = UUID.randomUUID();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", nonExistentUserId)
+        mockMvc.perform(post("/api/admin/user/{userId}/block", nonExistentUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -230,7 +230,7 @@ public class UserBlockUnblockControllerTest {
     void unblockUser_UserNotFound_ShouldReturn404() throws Exception {
         UUID nonExistentUserId = UUID.randomUUID();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/unblock", nonExistentUserId)
+        mockMvc.perform(post("/api/admin/user/{userId}/unblock", nonExistentUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -240,7 +240,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_WithoutAdminRole_ShouldReturn403() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + activeUserToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -250,7 +250,7 @@ public class UserBlockUnblockControllerTest {
     void unblockUser_WithoutAdminRole_ShouldReturn403() throws Exception {
         UUID userId = inactiveRegularUser.getId();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/unblock", userId)
+        mockMvc.perform(post("/api/admin/user/{userId}/unblock", userId)
                         .header("Authorization", "Bearer " + activeUserToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -261,7 +261,7 @@ public class UserBlockUnblockControllerTest {
         UsersEntity anotherAdmin = createUserWithRoles("anotherAdmin", "admin2@example.com", "admin123", true, adminRole);
         UUID adminUserId = anotherAdmin.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", adminUserId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", adminUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -284,7 +284,7 @@ public class UserBlockUnblockControllerTest {
         UsersEntity anotherAdmin = createUserWithRoles("anotherAdmin", "admin2@example.com", "admin123", false, adminRole);
         UUID adminUserId = anotherAdmin.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/unblock", adminUserId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/unblock", adminUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -307,7 +307,7 @@ public class UserBlockUnblockControllerTest {
         UsersEntity multiRoleUser = createUserWithRoles("multiRoleUser", "multi@example.com", "pass123", true, adminRole, userRole);
         UUID multiRoleUserId = multiRoleUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", multiRoleUserId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", multiRoleUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -329,7 +329,7 @@ public class UserBlockUnblockControllerTest {
     void blockUnblockCycle_Success() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        String blockResponseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        String blockResponseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -343,7 +343,7 @@ public class UserBlockUnblockControllerTest {
         UsersEntity afterBlock = usersRepository.findById(userId).orElseThrow();
         assertFalse(afterBlock.isActive());
 
-        String unblockResponseJson = mockMvc.perform(post("/api/admin/user/{user_id}/unblock", userId)
+        String unblockResponseJson = mockMvc.perform(post("/api/admin/user/{userId}/unblock", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -362,7 +362,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_BlockSelf_ShouldSucceed() throws Exception {
         UUID adminUserId = adminUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", adminUserId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", adminUserId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -384,7 +384,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_NoToken_ShouldReturn401() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -393,7 +393,7 @@ public class UserBlockUnblockControllerTest {
     void unblockUser_NoToken_ShouldReturn401() throws Exception {
         UUID userId = inactiveRegularUser.getId();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/unblock", userId)
+        mockMvc.perform(post("/api/admin/user/{userId}/unblock", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -402,7 +402,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_InvalidToken_ShouldReturn401() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer invalid.token.here")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -413,7 +413,7 @@ public class UserBlockUnblockControllerTest {
         UsersEntity userWithCards = createUserWithRoles("userWithCards", "cards@example.com", "pass123", true, userRole);
         UUID userId = userWithCards.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -437,17 +437,17 @@ public class UserBlockUnblockControllerTest {
         UsersEntity user2 = createUserWithRoles("user2", "user2@example.com", "pass123", true, userRole);
         UsersEntity user3 = createUserWithRoles("user3", "user3@example.com", "pass123", true, userRole);
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", user1.getId())
+        mockMvc.perform(post("/api/admin/user/{userId}/block", user1.getId())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/block", user2.getId())
+        mockMvc.perform(post("/api/admin/user/{userId}/block", user2.getId())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/admin/user/{user_id}/unblock", user3.getId())
+        mockMvc.perform(post("/api/admin/user/{userId}/unblock", user3.getId())
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -465,7 +465,7 @@ public class UserBlockUnblockControllerTest {
     void blockUser_ResponseFormat_Correct() throws Exception {
         UUID userId = activeRegularUser.getId();
 
-        String responseJson = mockMvc.perform(post("/api/admin/user/{user_id}/block", userId)
+        String responseJson = mockMvc.perform(post("/api/admin/user/{userId}/block", userId)
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

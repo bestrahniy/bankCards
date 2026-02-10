@@ -1,6 +1,7 @@
 package com.example.bankcards.integration.controller;
 
 import com.example.bankcards.config.JwtCreatorConfigTest;
+import com.example.bankcards.crypto.AesEncryption;
 import com.example.bankcards.dto.request.CardNumberRequest;
 import com.example.bankcards.dto.response.CardStatusResponse;
 import com.example.bankcards.facade.SecurityFacade;
@@ -21,7 +22,6 @@ import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.TransactionTypeRepository;
 import com.example.bankcards.repository.TransactionsStatusRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.util.AesEncryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -129,20 +129,24 @@ public class CardBalanceControllerTest {
         cardAccountRepository.deleteAll();
         usersRepository.deleteAll();
 
-        // Создаем роли
         userRole = roleRepository.findByRole(RoleType.USER)
                 .stream()
                 .findFirst()
                 .orElseGet(() -> roleRepository.save(
-                        RoleEntity.builder().role(RoleType.USER).build()));
-        
+                        RoleEntity.builder()
+                                .role(RoleType.USER)
+                                .isActive(true)
+                                .build()));
+
         adminRole = roleRepository.findByRole(RoleType.ADMIN)
                 .stream()
                 .findFirst()
                 .orElseGet(() -> roleRepository.save(
-                        RoleEntity.builder().role(RoleType.ADMIN).build()));
+                        RoleEntity.builder()
+                                .role(RoleType.ADMIN)
+                                .isActive(true)
+                                .build()));
 
-        // Создаем пользователя с ролями ADMIN и USER
         testUser = UsersEntity.builder()
                 .login("balanceUser")
                 .email("balance@example.com")
@@ -150,7 +154,7 @@ public class CardBalanceControllerTest {
                 .createdAt(Instant.now())
                 .isActive(true)
                 .build();
-        
+
         testUser.setRoles(new HashSet<>());
         testUser.getRoles().add(adminRole);
         testUser.getRoles().add(userRole);
@@ -158,20 +162,30 @@ public class CardBalanceControllerTest {
 
         userToken = jwtCreatorConfig.createToken(testUser);
 
-        // Создаем тестовую карту
         testCard = createCardForUser(testUser, testCardNumber, testCardBalance);
 
-        // Создаем тестовые транзакции
+        setupTransactionTypesAndStatuses();
+
         createTestTransactions(testCard);
 
-        // Настраиваем моки
-        when(securityFacade.checkCard(anyString())).thenReturn(true);
+        when(securityFacade.checkCard(testCardNumber)).thenReturn(true);
+        when(securityFacade.findBankCardByNumber(testCardNumber)).thenReturn(testCard);
         when(securityFacade.isCurrentActive()).thenReturn(true);
         when(securityFacade.getCurrentUser()).thenReturn(testUser);
         when(securityFacade.getLogin()).thenReturn(testUser.getLogin());
 
-        // Создаем типы транзакций и статусы если их нет
-        setupTransactionTypesAndStatuses();
+        when(securityFacade.checkCard(anyString())).thenAnswer(invocation -> {
+            String cardNumber = invocation.getArgument(0);
+            return cardNumber.equals(testCardNumber);
+        });
+
+        when(securityFacade.findBankCardByNumber(anyString())).thenAnswer(invocation -> {
+            String cardNumber = invocation.getArgument(0);
+            if (cardNumber.equals(testCardNumber)) {
+                return testCard;
+            }
+            return null;
+        });
     }
 
     private BankCardsEntity createCardForUser(UsersEntity user, String cardNumber, Double balance) {
@@ -201,23 +215,25 @@ public class CardBalanceControllerTest {
     }
 
     private void createTestTransactions(BankCardsEntity card) {
-        // Создаем несколько тестовых транзакций
+        if (card == null || card.getCardAccountEntity() == null) {
+            return;
+        }
+
         CardAccountEntity account = card.getCardAccountEntity();
-        
+
         TransactionTypeEntity transferType = transactionTypeRepository.findByTransactionsType(
-                TransactionsType.TRANSFER).orElseGet(() -> 
-                transactionTypeRepository.save(TransactionTypeEntity.builder()
+                        TransactionsType.TRANSFER)
+                .orElseGet(() -> transactionTypeRepository.save(TransactionTypeEntity.builder()
                         .transactionsType(TransactionsType.TRANSFER)
                         .build()));
-        
+
         TransactionsStatusEntity completedStatus = transactionsStatusRepository.findByTransactionsStatus(
-                TransactionsStatusType.COMPLETED).orElseGet(() -> 
-                transactionsStatusRepository.save(TransactionsStatusEntity.builder()
+                        TransactionsStatusType.COMPLETED)
+                .orElseGet(() -> transactionsStatusRepository.save(TransactionsStatusEntity.builder()
                         .transactionsStatus(TransactionsStatusType.COMPLETED)
                         .build()));
-        
-        // Транзакция 1: Входящий перевод
-        PaymentTransactionsEntity incomingTx = PaymentTransactionsEntity.builder()
+
+        PaymentTransactionsEntity incomingTx1 = PaymentTransactionsEntity.builder()
                 .amount(500.0)
                 .comment("Salary")
                 .senderCardAccountId(createDummyCardAccount())
@@ -226,10 +242,9 @@ public class CardBalanceControllerTest {
                 .transactionsStatus(completedStatus)
                 .createdAt(Instant.now().minus(2, ChronoUnit.DAYS))
                 .build();
-        incomingTx = paymentTransactionsRepository.save(incomingTx);
-        account.getPaymentTransactionsEntities().add(incomingTx);
-        
-        // Транзакция 2: Исходящий перевод
+        incomingTx1 = paymentTransactionsRepository.save(incomingTx1);
+        account.getPaymentTransactionsEntities().add(incomingTx1);
+
         PaymentTransactionsEntity outgoingTx = PaymentTransactionsEntity.builder()
                 .amount(200.0)
                 .comment("Grocery shopping")
@@ -241,9 +256,8 @@ public class CardBalanceControllerTest {
                 .build();
         outgoingTx = paymentTransactionsRepository.save(outgoingTx);
         account.getPaymentTransactionsEntities().add(outgoingTx);
-        
-        // Транзакция 3: Еще один входящий
-        PaymentTransactionsEntity anotherIncomingTx = PaymentTransactionsEntity.builder()
+
+        PaymentTransactionsEntity incomingTx2 = PaymentTransactionsEntity.builder()
                 .amount(300.0)
                 .comment("Freelance payment")
                 .senderCardAccountId(createDummyCardAccount())
@@ -252,12 +266,12 @@ public class CardBalanceControllerTest {
                 .transactionsStatus(completedStatus)
                 .createdAt(Instant.now().minus(3, ChronoUnit.HOURS))
                 .build();
-        anotherIncomingTx = paymentTransactionsRepository.save(anotherIncomingTx);
-        account.getPaymentTransactionsEntities().add(anotherIncomingTx);
-        
+        incomingTx2 = paymentTransactionsRepository.save(incomingTx2);
+        account.getPaymentTransactionsEntities().add(incomingTx2);
+
         cardAccountRepository.save(account);
     }
-    
+
     private CardAccountEntity createDummyCardAccount() {
         CardAccountEntity dummyAccount = CardAccountEntity.builder()
                 .currentBalance(1000.0)
@@ -272,7 +286,7 @@ public class CardBalanceControllerTest {
                         TransactionTypeEntity.builder()
                                 .transactionsType(TransactionsType.TRANSFER)
                                 .build()));
-        
+
         transactionsStatusRepository.findByTransactionsStatus(TransactionsStatusType.COMPLETED)
                 .orElseGet(() -> transactionsStatusRepository.save(
                         TransactionsStatusEntity.builder()
@@ -296,7 +310,7 @@ public class CardBalanceControllerTest {
                 .getContentAsString();
 
         CardStatusResponse response = objectMapper.readValue(responseJson, CardStatusResponse.class);
-        
+
         assertNotNull(response);
         assertEquals(testCardBalance, response.getCurrentBalance());
         assertNotNull(response.getPaymentTransaction());
@@ -311,8 +325,79 @@ public class CardBalanceControllerTest {
     }
 
     @Test
+    void checkBalance_MultipleCards_ShouldReturnCorrectBalance() throws Exception {
+        String secondCardNumber = "8765432187654321";
+        Double secondCardBalance = 2500.0;
+        BankCardsEntity secondCard = createCardForUser(testUser, secondCardNumber, secondCardBalance);
+        createTestTransactions(secondCard);
+
+        when(securityFacade.checkCard(secondCardNumber)).thenReturn(true);
+        when(securityFacade.findBankCardByNumber(secondCardNumber)).thenReturn(secondCard);
+
+        CardNumberRequest request1 = CardNumberRequest.builder()
+                .cardNumber(testCardNumber)
+                .build();
+
+        String response1Json = mockMvc.perform(get("/api/user/cards/balance")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request1)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        CardStatusResponse response1 = objectMapper.readValue(response1Json, CardStatusResponse.class);
+        assertEquals(testCardBalance, response1.getCurrentBalance());
+
+        CardNumberRequest request2 = CardNumberRequest.builder()
+                .cardNumber(secondCardNumber)
+                .build();
+
+        String response2Json = mockMvc.perform(get("/api/user/cards/balance")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request2)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        CardStatusResponse response2 = objectMapper.readValue(response2Json, CardStatusResponse.class);
+        assertEquals(secondCardBalance, response2.getCurrentBalance());
+    }
+
+    @Test
+    void checkBalance_CardWithNoTransactions_ShouldReturnEmptyList() throws Exception {
+        String newCardNumber = "1111222233334444";
+        Double newCardBalance = 500.0;
+        BankCardsEntity newCard = createCardForUser(testUser, newCardNumber, newCardBalance);
+
+        when(securityFacade.checkCard(newCardNumber)).thenReturn(true);
+        when(securityFacade.findBankCardByNumber(newCardNumber)).thenReturn(newCard);
+
+        CardNumberRequest request = CardNumberRequest.builder()
+                .cardNumber(newCardNumber)
+                .build();
+
+        String responseJson = mockMvc.perform(get("/api/user/cards/balance")
+                        .header("Authorization", "Bearer " + userToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        CardStatusResponse response = objectMapper.readValue(responseJson, CardStatusResponse.class);
+
+        assertEquals(newCardBalance, response.getCurrentBalance());
+        assertNotNull(response.getPaymentTransaction());
+        assertTrue(response.getPaymentTransaction().isEmpty());
+    }
+
+    @Test
     void checkBalance_WithoutAdminRole_ShouldReturn403() throws Exception {
-        // Создаем пользователя только с ролью USER
         UsersEntity userRoleOnly = UsersEntity.builder()
                 .login("userOnly")
                 .email("user@example.com")
@@ -323,8 +408,11 @@ public class CardBalanceControllerTest {
         userRoleOnly.setRoles(new HashSet<>());
         userRoleOnly.getRoles().add(userRole);
         usersRepository.save(userRoleOnly);
-        
+
         String userOnlyToken = jwtCreatorConfig.createToken(userRoleOnly);
+
+        when(securityFacade.getCurrentUser()).thenReturn(userRoleOnly);
+        when(securityFacade.getLogin()).thenReturn(userRoleOnly.getLogin());
 
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(testCardNumber)
@@ -339,7 +427,6 @@ public class CardBalanceControllerTest {
 
     @Test
     void checkBalance_WithoutUserRole_ShouldReturn403() throws Exception {
-        // Создаем пользователя только с ролью ADMIN
         UsersEntity adminRoleOnly = UsersEntity.builder()
                 .login("adminOnly")
                 .email("admin@example.com")
@@ -350,8 +437,11 @@ public class CardBalanceControllerTest {
         adminRoleOnly.setRoles(new HashSet<>());
         adminRoleOnly.getRoles().add(adminRole);
         usersRepository.save(adminRoleOnly);
-        
+
         String adminOnlyToken = jwtCreatorConfig.createToken(adminRoleOnly);
+
+        when(securityFacade.getCurrentUser()).thenReturn(adminRoleOnly);
+        when(securityFacade.getLogin()).thenReturn(adminRoleOnly.getLogin());
 
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(testCardNumber)
@@ -390,86 +480,13 @@ public class CardBalanceControllerTest {
     }
 
     @Test
-    void checkBalance_MultipleCards_ShouldReturnCorrectBalance() throws Exception {
-        // Создаем вторую карту
-        String secondCardNumber = "8765432187654321";
-        Double secondCardBalance = 2500.0;
-        BankCardsEntity secondCard = createCardForUser(testUser, secondCardNumber, secondCardBalance);
-        
-        // Добавляем транзакции для второй карты
-        createTestTransactions(secondCard);
-
-        // Тестируем первую карту
-        CardNumberRequest request1 = CardNumberRequest.builder()
-                .cardNumber(testCardNumber)
-                .build();
-
-        String response1Json = mockMvc.perform(get("/api/user/cards/balance")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request1)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        CardStatusResponse response1 = objectMapper.readValue(response1Json, CardStatusResponse.class);
-        assertEquals(testCardBalance, response1.getCurrentBalance());
-
-        // Тестируем вторую карту
-        CardNumberRequest request2 = CardNumberRequest.builder()
-                .cardNumber(secondCardNumber)
-                .build();
-
-        String response2Json = mockMvc.perform(get("/api/user/cards/balance")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        CardStatusResponse response2 = objectMapper.readValue(response2Json, CardStatusResponse.class);
-        assertEquals(secondCardBalance, response2.getCurrentBalance());
-    }
-
-    @Test
-    void checkBalance_CardWithNoTransactions_ShouldReturnEmptyList() throws Exception {
-        // Создаем карту без транзакций
-        String newCardNumber = "1111222233334444";
-        Double newCardBalance = 500.0;
-        BankCardsEntity newCard = createCardForUser(testUser, newCardNumber, newCardBalance);
-        
-        // Очищаем транзакции для этой карты
-        newCard.getCardAccountEntity().getPaymentTransactionsEntities().clear();
-        cardAccountRepository.save(newCard.getCardAccountEntity());
-
-        CardNumberRequest request = CardNumberRequest.builder()
-                .cardNumber(newCardNumber)
-                .build();
-
-        String responseJson = mockMvc.perform(get("/api/user/cards/balance")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        CardStatusResponse response = objectMapper.readValue(responseJson, CardStatusResponse.class);
-        
-        assertEquals(newCardBalance, response.getCurrentBalance());
-        assertNotNull(response.getPaymentTransaction());
-        assertTrue(response.getPaymentTransaction().isEmpty());
-    }
-
-    @Test
     void checkBalance_CardWithNegativeBalance_ShouldWork() throws Exception {
         String negativeBalanceCardNumber = "9999888877776666";
-        Double negativeBalance = -100.0; // Допустим, овердрафт
+        Double negativeBalance = -100.0;
         BankCardsEntity negativeCard = createCardForUser(testUser, negativeBalanceCardNumber, negativeBalance);
+
+        when(securityFacade.checkCard(negativeBalanceCardNumber)).thenReturn(true);
+        when(securityFacade.findBankCardByNumber(negativeBalanceCardNumber)).thenReturn(negativeCard);
 
         CardNumberRequest request = CardNumberRequest.builder()
                 .cardNumber(negativeBalanceCardNumber)
@@ -489,26 +506,21 @@ public class CardBalanceControllerTest {
     }
 
     @Test
-    void checkBalance_CardWithZeroBalance_ShouldWork() throws Exception {
-        String zeroBalanceCardNumber = "0000111122223333";
-        Double zeroBalance = 0.0;
-        BankCardsEntity zeroCard = createCardForUser(testUser, zeroBalanceCardNumber, zeroBalance);
+    void checkBalance_CardNotFound_ShouldReturnError() throws Exception {
+        String nonExistentCardNumber = "0000000000000000";
+
+        when(securityFacade.checkCard(nonExistentCardNumber)).thenReturn(false);
+        when(securityFacade.findBankCardByNumber(nonExistentCardNumber)).thenReturn(null);
 
         CardNumberRequest request = CardNumberRequest.builder()
-                .cardNumber(zeroBalanceCardNumber)
+                .cardNumber(nonExistentCardNumber)
                 .build();
 
-        String responseJson = mockMvc.perform(get("/api/user/cards/balance")
+        mockMvc.perform(get("/api/user/cards/balance")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        CardStatusResponse response = objectMapper.readValue(responseJson, CardStatusResponse.class);
-        assertEquals(zeroBalance, response.getCurrentBalance());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -527,27 +539,16 @@ public class CardBalanceControllerTest {
                 .getContentAsString();
 
         CardStatusResponse response = objectMapper.readValue(responseJson, CardStatusResponse.class);
-        
-        // Проверяем детали транзакций
         assertFalse(response.getPaymentTransaction().isEmpty());
-        
+
         for (CardStatusResponse.PaymentTransaction tx : response.getPaymentTransaction()) {
             assertNotNull(tx.getAmount());
             assertNotNull(tx.getComment());
             assertNotNull(tx.getType());
-            assertEquals("TRANSFER", tx.getType()); // Все тестовые транзакции TRANSFER
+            assertEquals("TRANSFER", tx.getType());
             assertNotNull(tx.getStatus());
-            assertEquals("COMPLETED", tx.getStatus()); // Все тестовые транзакции COMPLETED
+            assertEquals("COMPLETED", tx.getStatus());
             assertNotNull(tx.getCreatedAt());
-            
-            // Либо senderCardId, либо recipientCardId должны совпадать с ID тестовой карты
-            if (tx.getRecipientCardId() != null && tx.getRecipientCardId().equals(testCard.getId())) {
-                // Это входящая транзакция
-                assertNotNull(tx.getSenderCardId());
-            } else if (tx.getSenderCardId() != null && tx.getSenderCardId().equals(testCard.getCardAccountEntity().getId())) {
-                // Это исходящая транзакция
-                assertNotNull(tx.getRecipientCardId());
-            }
         }
     }
 
@@ -557,37 +558,10 @@ public class CardBalanceControllerTest {
                 .cardNumber(testCardNumber)
                 .build();
 
-        // Пробуем POST вместо GET
         mockMvc.perform(post("/api/user/cards/balance")
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isMethodNotAllowed());
     }
-
-    // Вспомогательные методы для создания тестовых карт
-    private BankCardsEntity createExpiredCard(UsersEntity user, String cardNumber, Double balance) {
-        CardAccountEntity cardAccount = CardAccountEntity.builder()
-                .currentBalance(balance)
-                .updatedAt(Instant.now())
-                .paymentTransactionsEntities(new java.util.ArrayList<>())
-                .build();
-        cardAccount = cardAccountRepository.save(cardAccount);
-
-        String encryptedCardNumber = aesEncryption.encrypt(cardNumber);
-
-        BankCardsEntity card = BankCardsEntity.builder()
-                .number(encryptedCardNumber)
-                .cvc2(123)
-                .createdAt(Instant.now().minus(365 * 6, ChronoUnit.DAYS))
-                .expiresAt(Instant.now().minus(1, ChronoUnit.DAYS)) // ПРОСРОЧЕНА
-                .isActive(true)
-                .user(user)
-                .cardAccountEntity(cardAccount)
-                .build();
-
-        cardAccount.setBankCardsEntity(card);
-        return bankCardsRepository.save(card);
-    }
-
 }

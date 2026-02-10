@@ -9,6 +9,9 @@ import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.NotificationRepository;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
+@Transactional
 public class CardCreateNotificationTest {
 
     @Container

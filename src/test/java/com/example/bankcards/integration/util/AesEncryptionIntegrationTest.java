@@ -15,10 +15,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import com.example.bankcards.crypto.AesEncryption;
+import com.example.bankcards.crypto.AesHelper;
 import com.example.bankcards.facade.SecurityFacade;
 import com.example.bankcards.repository.BankCardsRepository;
-import com.example.bankcards.util.AesEncryption;
-import com.example.bankcards.util.AesHelper;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest

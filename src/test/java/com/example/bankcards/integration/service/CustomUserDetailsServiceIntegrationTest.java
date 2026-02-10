@@ -24,9 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CustomUserDetailsServiceIntegrationTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:17")
-    );
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {

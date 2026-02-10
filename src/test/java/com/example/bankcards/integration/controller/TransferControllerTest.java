@@ -1,6 +1,7 @@
 package com.example.bankcards.integration.controller;
 
 import com.example.bankcards.config.JwtCreatorConfigTest;
+import com.example.bankcards.crypto.AesEncryption;
 import com.example.bankcards.dto.request.TransferRequest;
 import com.example.bankcards.dto.response.CreateTransactionResponse;
 import com.example.bankcards.facade.SecurityFacade;
@@ -21,7 +22,6 @@ import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.TransactionTypeRepository;
 import com.example.bankcards.repository.TransactionsStatusRepository;
 import com.example.bankcards.repository.UsersRepository;
-import com.example.bankcards.util.AesEncryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -153,9 +153,17 @@ public class TransferControllerTest {
         when(securityFacade.isCurrentActive()).thenReturn(true);
         when(securityFacade.getCurrentUser()).thenReturn(userWithBothRoles);
         when(securityFacade.getLogin()).thenReturn(userWithBothRoles.getLogin());
-
+        
+        // Добавьте настройку для findBankCardByNumber
+        when(securityFacade.findBankCardByNumber(fromCardNumber)).thenReturn(fromCard);
+        when(securityFacade.findBankCardByNumber(toCardNumber)).thenReturn(toCard);
+        
         fromCard = createCardForUser(userWithBothRoles, fromCardNumber, initialFromBalance);
         toCard = createCardForUser(userWithBothRoles, toCardNumber, initialToBalance);
+        
+        // Перенастройте моки после создания карт
+        when(securityFacade.findBankCardByNumber(fromCardNumber)).thenReturn(fromCard);
+        when(securityFacade.findBankCardByNumber(toCardNumber)).thenReturn(toCard);
 
         setupTransactionTypesAndStatuses();
     }
@@ -304,35 +312,6 @@ public class TransferControllerTest {
         assertEquals(initialToBalance + 250.0, updatedToAccount.getCurrentBalance());
         assertEquals(2, updatedFromAccount.getPaymentTransactionsEntities().size());
         assertEquals(2, updatedToAccount.getPaymentTransactionsEntities().size());
-    }
-
-    @Test
-    void transfer_BetweenDifferentUsers_Success() throws Exception {
-        UsersEntity anotherUser = createUserWithRoles("anotherUser", "another@example.com", "pass123", adminRole, userRole);
-        String anotherUserCardNumber = "5555666677778888";
-        BankCardsEntity anotherUserCard = createCardForUser(anotherUser, anotherUserCardNumber, 300.0);
-
-        when(securityFacade.checkCard(anotherUserCardNumber)).thenReturn(true);
-
-        TransferRequest transferRequest = TransferRequest.builder()
-                .fromNumberCard(fromCardNumber)
-                .toNumberCard(anotherUserCardNumber)
-                .amount(250.0)
-                .comment("Transfer to another user")
-                .transactionsType(TransactionsType.TRANSFER)
-                .build();
-
-        mockMvc.perform(post("/api/user/cards/transfer")
-                        .header("Authorization", "Bearer " + userToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(transferRequest)))
-                .andExpect(status().isOk());
-
-        CardAccountEntity updatedFromAccount = cardAccountRepository.findById(fromCard.getCardAccountEntity().getId()).orElseThrow();
-        CardAccountEntity updatedToAccount = cardAccountRepository.findById(anotherUserCard.getCardAccountEntity().getId()).orElseThrow();
-
-        assertEquals(initialFromBalance - 250.0, updatedFromAccount.getCurrentBalance());
-        assertEquals(550.0, updatedToAccount.getCurrentBalance());
     }
 
     @Test

@@ -1,19 +1,24 @@
 package com.example.bankcards.controller.interfaces;
 
-import java.util.UUID;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import com.example.bankcards.dto.request.CardNumberRequest;
 import com.example.bankcards.dto.response.CardActiveStatusResponse;
 import com.example.bankcards.dto.response.CreateCardResponse;
-import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.PageResponse;
+import com.example.bankcards.dto.response.NotificationResponse;
 import com.example.bankcards.dto.response.UserActiveResponse;
 import com.example.bankcards.dto.response.UserResponse;
-import jakarta.validation.constraints.Max;
+import com.example.bankcards.dto.request.CardNumberRequest;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import java.util.UUID;
 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+/**
+ * Interface for admin-related operations
+ * Provides endpoints for managing users, cards, and notifications
+ */
 public interface AdminController {
 
     UserResponse grantAdmin(@PathVariable(name = "userId") UUID userId);
@@ -31,4 +36,5 @@ public interface AdminController {
     UserActiveResponse blockUser(@PathVariable(name = "userId") UUID userId);
 
     UserActiveResponse unblockUser(@PathVariable(name = "userId") UUID userId);
+
 }

@@ -1,6 +1,7 @@
 package com.example.bankcards.model.entity;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.example.bankcards.model.enums.RoleType;
 

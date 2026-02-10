@@ -1,7 +1,6 @@
 package com.example.bankcards.exception.userException;
 
 import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import com.example.bankcards.exception.abstractClass.NotFoundException;
 

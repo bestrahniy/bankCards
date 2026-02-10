@@ -88,8 +88,11 @@ public class RefreshTokenAccessTokenCreationTest {
     private PasswordEncoder passwordEncoder;
 
     private UsersEntity user;
+
     private RoleEntity userRole;
+
     private RoleEntity adminRole;
+
     private String validRefreshTokenHash;
 
     @BeforeEach
@@ -154,7 +157,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(validRefreshTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -197,7 +200,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(validRefreshTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -237,7 +240,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(userTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -271,7 +274,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(tokenHash1)
                 .build();
 
-        String responseJson1 = mockMvc.perform(post("/api/user/refresh")
+        String responseJson1 = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request1)))
                 .andExpect(status().isOk())
@@ -283,7 +286,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(tokenHash2)
                 .build();
 
-        String responseJson2 = mockMvc.perform(post("/api/user/refresh")
+        String responseJson2 = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request2)))
                 .andExpect(status().isOk())
@@ -312,7 +315,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(validRefreshTokenHash)
                 .build();
 
-        String responseJson1 = mockMvc.perform(post("/api/user/refresh")
+        String responseJson1 = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -320,7 +323,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .getResponse()
                 .getContentAsString();
 
-        String responseJson2 = mockMvc.perform(post("/api/user/refresh")
+        String responseJson2 = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -354,7 +357,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(validRefreshTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -381,7 +384,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(invalidTokenHash)
                 .build();
 
-        mockMvc.perform(post("/api/user/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -395,7 +398,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(validRefreshTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -436,7 +439,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(expiredTokenHash)
                 .build();
 
-        mockMvc.perform(post("/api/user/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -452,7 +455,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(inactiveTokenHash)
                 .build();
 
-        mockMvc.perform(post("/api/user/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -478,7 +481,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(noRolesTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -504,7 +507,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken("")
                 .build();
 
-        mockMvc.perform(post("/api/user/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -516,7 +519,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(null)
                 .build();
 
-        mockMvc.perform(post("/api/user/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -535,7 +538,7 @@ public class RefreshTokenAccessTokenCreationTest {
                 .hashRefreshToken(inactiveUserTokenHash)
                 .build();
 
-        String responseJson = mockMvc.perform(post("/api/user/refresh")
+        String responseJson = mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

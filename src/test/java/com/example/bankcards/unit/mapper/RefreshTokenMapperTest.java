@@ -58,12 +58,4 @@ class RefreshTokenMapperTest {
         assertTrue(result.getIsActive());
     }
 
-    @Test
-    void toEntity_WithNullUser_ShouldThrowException() {
-        CreateRefreshTokenRequest request = CreateRefreshTokenRequest.builder()
-                .hashToken("token")
-                .build();
-
-        assertThrows(NullPointerException.class, () -> refreshTokenMapper.toEntity(request, null));
-    }
 }

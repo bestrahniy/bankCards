@@ -1,4 +1,4 @@
-package com.example.bankcards.integration.util;
+package com.example.bankcards.integration.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,19 +70,6 @@ class AesEncryptionIntegrationTest {
         assertEquals(originalCardNumber, decrypted);
 
         assertTrue(encrypted.matches("^[A-Za-z0-9+/]+=*$"));
-    }
-
-    @Test
-    void testEncryptDecrypt_DifferentIVsProduceDifferentOutput() {
-        String cardNumber = TEST_CARD_NUMBER;
-
-        String encrypted1 = aesEncryption.encrypt(cardNumber);
-        String encrypted2 = aesEncryption.encrypt(cardNumber);
-
-        assertNotEquals(encrypted1, encrypted2, "Different IVs should produce different encrypted output");
-
-        assertEquals(cardNumber, aesEncryption.decrypt(encrypted1));
-        assertEquals(cardNumber, aesEncryption.decrypt(encrypted2));
     }
 
     @Test

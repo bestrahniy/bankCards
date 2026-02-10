@@ -8,8 +8,6 @@ import com.example.bankcards.model.enums.RoleType;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UsersRepository;
 import com.example.bankcards.service.AdminUserServiceImpl;
-import com.example.bankcards.service.interfaces.AdminUserService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

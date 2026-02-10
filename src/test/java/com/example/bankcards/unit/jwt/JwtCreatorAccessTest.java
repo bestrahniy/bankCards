@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import com.example.bankcards.exception.requestException.RolesEmptyException;
 import com.example.bankcards.exception.userException.UserNullException;
 import com.example.bankcards.jwt.JwtCreator;
@@ -18,7 +17,6 @@ import com.example.bankcards.mapper.RefreshTokenMapperImpl;
 import com.example.bankcards.model.entity.RoleEntity;
 import com.example.bankcards.model.entity.UsersEntity;
 import com.example.bankcards.model.enums.RoleType;
-
 import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;

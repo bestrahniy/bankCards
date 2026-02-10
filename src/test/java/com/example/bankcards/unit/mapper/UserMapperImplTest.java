@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,7 +69,7 @@ class UserMapperImplTest {
                 .isActive(true)
                 .build());
         roles.add(RoleEntity.builder()
-                .id(1L)
+                .id(2L)
                 .role(RoleType.ADMIN)
                 .isActive(true)
                 .build());
@@ -94,8 +93,8 @@ class UserMapperImplTest {
         
         assertNotNull(result.getRoles());
         assertEquals(2, result.getRoles().size());
-        assertTrue(result.getRoles().contains("ROLE_USER"));
-        assertTrue(result.getRoles().contains("ROLE_ADMIN"));
+        assertTrue(result.getRoles().contains("USER"));
+        assertTrue(result.getRoles().contains("ADMIN"));
         
         assertNull(result.getJwt());
         assertNull(result.getRefreshToken());
@@ -108,6 +107,7 @@ class UserMapperImplTest {
         
         Set<RoleEntity> roles = new HashSet<>();
         RoleEntity userRole = RoleEntity.builder()
+                .id(1L)
                 .role(RoleType.USER)
                 .isActive(true)
                 .build();
@@ -144,7 +144,7 @@ class UserMapperImplTest {
         
         assertNotNull(result.getRoles());
         assertEquals(1, result.getRoles().size());
-        assertTrue(result.getRoles().contains("ROLE_USER"));
+        assertTrue(result.getRoles().contains("USER"));
         
         assertEquals(jwtToken, result.getJwt());
         assertEquals(refreshTokenHash, result.getRefreshToken());
@@ -246,11 +246,13 @@ class UserMapperImplTest {
     @Test
     void toDtoUserResponse_ShouldConvertRolesToStrings() {
         RoleEntity userRole = RoleEntity.builder()
+                .id(1L)
                 .role(RoleType.USER)
                 .isActive(true)
                 .build();
         
         RoleEntity adminRole = RoleEntity.builder()
+                .id(2L)
                 .role(RoleType.ADMIN)
                 .isActive(true)
                 .build();
@@ -268,8 +270,8 @@ class UserMapperImplTest {
 
         assertNotNull(result.getRoles());
         assertEquals(2, result.getRoles().size());
-        assertTrue(result.getRoles().contains("ROLE_USER"));
-        assertTrue(result.getRoles().contains("ROLE_ADMIN"));
+        assertTrue(result.getRoles().contains("USER"));
+        assertTrue(result.getRoles().contains("ADMIN"));
     }
 
     @Test

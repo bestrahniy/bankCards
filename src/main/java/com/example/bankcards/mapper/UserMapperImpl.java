@@ -61,7 +61,7 @@ public class UserMapperImpl implements UserMapper {
         }
 
         Set<String> roles = usersEntity.getRoles().stream()
-                .map(role -> role.toString())
+                .map(role -> role.getRole().toString())
                 .collect(Collectors.toSet());
         
         log.trace("User roles mapped: {}", roles);
@@ -95,7 +95,7 @@ public class UserMapperImpl implements UserMapper {
         }
 
         Set<String> roles = usersEntity.getRoles().stream()
-                .map(role -> role.toString())
+                .map(role -> role.getRole().toString())
                 .collect(Collectors.toSet());
         
         log.trace("User roles mapped: {}, JWT present: {}, Refresh token present: {}", 

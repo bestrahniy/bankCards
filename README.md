@@ -1,7 +1,4 @@
 # Bank Cards Management System
-## Project Overview
-**Bank Cards Management System** is a comprehensive RESTful API for managing bank cards, users, and financial transactions. The system provides a secure and scalable solution for processing payment operations while maintaining all security requirements.
-
 ## Functional Requirements
 
 ### Administrator:

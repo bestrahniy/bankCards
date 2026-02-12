@@ -21,6 +21,9 @@
   - Card block requests
 - Admin can view and manage active requests
 
+## enviroment
+All configuration files and environment variables are included in the repository since this is a test assignment and I want to showcase them.
+
 ## To Start
 
 ### Prerequisites
